@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 
 export const patchPasswordService = async (payload: Credential): Promise<void> => {
   const { id, newPassword, oldPassword } = payload
-  const currentTime = String(Date.now())
+  const currentTime = new Date()
 
   const account = await prisma.users.findMany({
     where: {

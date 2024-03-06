@@ -5,6 +5,7 @@ import { Auth } from '../middlewares/Auth'
 import { patchPassword } from '../controllers/credentials'
 const router: Router = Router()
 
+const auth = new Auth('', [])
 const adminAuth = new Auth('admin', ['sudo'])
 const sudoAuth = new Auth('sudo', [])
 
@@ -14,7 +15,7 @@ router.patch('/users/:userId', updateUser)
 router.delete('/users/:userId', sudoAuth.validate, deleteUser)
 router.get('/users', adminAuth.validate, getUsers)
 router.get('/users/detail', getUser)
-router.patch('/users/credential', patchPassword)
+router.patch('/credential', auth.validateSession, patchPassword)
 
 /* AUTH */
 router.post('/auth', addSession)
