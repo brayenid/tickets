@@ -1,5 +1,5 @@
 import type { User, Users } from '../../interfaces/Users'
-import { NotFoundError, PrismaError } from '../../utils/Errors'
+import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 
 import { prisma, Prisma } from '../../utils/Db'
 
@@ -134,4 +134,28 @@ export const getUserByIdService = async (id: string): Promise<Users> => {
   }
 
   return user[0]
+}
+
+export const createSudoService = async (payload: User): Promise<void> => {
+  const { id, name, password, role, username } = payload
+  const sudo = await prisma.users.findMany({
+    where: {
+      role: 'sudo'
+    },
+    take: 1
+  })
+
+  if (sudo.length > 0) {
+    throw new BadRequestError('Creating sudo fail, it is already existed')
+  }
+
+  await prisma.users.create({
+    data: {
+      id,
+      name,
+      password,
+      role,
+      username
+    }
+  })
 }

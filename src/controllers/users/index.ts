@@ -9,6 +9,7 @@ import { z } from 'zod'
 import bcrypt from 'bcrypt'
 import {
   addUserService,
+  createSudoService,
   deleteUserService,
   getUserByIdService,
   getUsersService,
@@ -186,6 +187,41 @@ export const getUser = async (req: Request, res: Response): Promise<Response> =>
     return res.status(500).json({
       status: 'fail',
       message: error.message
+    })
+  }
+}
+
+export const createSudo = async (req: Request, res: Response): Promise<Response> => {
+  const username = String(process.env.SUDO_USERNAME)
+  const password = String(process.env.SUDO_PASSWORD)
+
+  const hashedPassword = await bcrypt.hash(password, 10)
+  const id = nanoid(12)
+
+  try {
+    await createSudoService({
+      id,
+      name: 'Super Admin',
+      password: hashedPassword,
+      role: 'sudo',
+      username
+    })
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Sudo created successfully'
+    })
+  } catch (error: any) {
+    if (error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        error: error.message
+      })
+    }
+
+    return res.status(500).json({
+      status: 'fail',
+      error: error.message
     })
   }
 }

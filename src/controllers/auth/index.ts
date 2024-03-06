@@ -42,7 +42,7 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
       message: 'Login successfully'
     })
   } catch (error: any) {
-    if (error instanceof PrismaError || error instanceof BadRequestError) {
+    if (error instanceof PrismaError || error instanceof BadRequestError || error instanceof AuthError) {
       return res.status(400).json({
         status: 'fail',
         message: error.message
