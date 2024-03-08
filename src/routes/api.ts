@@ -3,8 +3,8 @@ import { addUser, createSudo, deleteUser, getUser, getUsers, updateUser } from '
 import { addSession, removeSession } from '../controllers/auth'
 import { Auth } from '../middlewares/Auth'
 import { patchPassword } from '../controllers/credentials'
-import { addEvent, getEventById, getEvents } from '../controllers/events'
-import { eventThumbnailMiddleware } from '../middlewares/multer/Event'
+import { addEvent, deleteEvent, getEventById, getEvents, updateEvent } from '../controllers/events'
+import { eventThumbnailMiddleware, updateEventThumbnailMiddleware } from '../middlewares/multer/Event'
 const router: Router = Router()
 
 const auth = new Auth('', [])
@@ -28,5 +28,7 @@ router.delete('/auth', removeSession)
 router.post('/events', adminAuth.validate, eventThumbnailMiddleware, addEvent)
 router.get('/events', getEvents)
 router.get('/events/:eventId', getEventById)
+router.put('/events/:eventId', adminAuth.validate, updateEventThumbnailMiddleware, updateEvent)
+router.delete('/events/:eventId', adminAuth.validate, deleteEvent)
 
 export default router

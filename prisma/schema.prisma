@@ -30,20 +30,23 @@ model Session {
 }
 
 model Events {
-  id          String   @id
+  id          String        @id
   name        String
   location    String
   date        String
   description String
-  isOped      Boolean  @default(true)
-  isSale      Boolean  @default(false)
-  thumbnail   String   @default("null")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  isOpen      Boolean       @default(true)
+  isSale      Boolean       @default(false)
+  thumbnail   String        @default("null")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now())
+  EventPrices EventPrices[]
 }
 
 model EventPrices {
-  id    String @id
-  name  String
-  price Int
+  id      String @id
+  name    String
+  price   Int
+  event   Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId String
 }

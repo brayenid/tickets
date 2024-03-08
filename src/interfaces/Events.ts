@@ -3,7 +3,7 @@ export interface EventBasic {
   location: string
   date: string
   description: string
-  thumbnail: string
+  thumbnail?: string
 }
 
 export interface EventPayload extends EventBasic {

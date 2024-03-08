@@ -1,6 +1,6 @@
 import type { EventPayload } from '../../interfaces/Events'
 import { Prisma, prisma } from '../../utils/Db'
-import { PrismaError } from '../../utils/Errors'
+import { BadRequestError, PrismaError } from '../../utils/Errors'
 
 export const addEventService = async (payload: EventPayload): Promise<void> => {
   const { id, date, description, location, name, thumbnail } = payload
@@ -37,7 +37,7 @@ export const getEventsService = async (
   const events = await prisma.events.findMany({
     select: {
       id: true,
-      isOped: true,
+      isOpen: true,
       name: true,
       location: true,
       date: true,
@@ -80,6 +80,59 @@ export const getEventByIdService = async (id: string): Promise<EventPayload[]> =
   return event
 }
 
-// export const updateEventService = async (payload: EventBasic) => {
-//   const { id, date, description, location, name, price } = payload
-// }
+export const updateEventService = async (payload: EventPayload): Promise<void> => {
+  const { id, date, description, location, name } = payload
+  const currentTime = new Date()
+
+  const getEventInfo = await prisma.events.findMany({
+    select: {
+      id: true
+    },
+    where: {
+      id
+    },
+    take: 1
+  })
+
+  if (getEventInfo.length < 1) {
+    throw new BadRequestError('Failed to update event, invalid ID')
+  }
+  await prisma.events.update({
+    data: {
+      date,
+      description,
+      location,
+      name,
+      updatedAt: currentTime
+    },
+    where: {
+      id
+    }
+  })
+}
+
+export const deleteEventService = async (id: string): Promise<string> => {
+  const getEventInfo = await prisma.events.findMany({
+    select: {
+      id: true,
+      thumbnail: true
+    },
+    where: {
+      id
+    }
+  })
+
+  if (getEventInfo.length < 1) {
+    throw new BadRequestError('Failed to delete event, invalid ID')
+  }
+  const event = await prisma.events.delete({
+    select: {
+      thumbnail: true
+    },
+    where: {
+      id
+    }
+  })
+
+  return event.thumbnail
+}
