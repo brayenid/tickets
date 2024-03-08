@@ -1,6 +1,6 @@
 export interface UserRequestBody {
   name: string
-  username: string
+  email: string
   password: string
   role: string
 }
@@ -12,7 +12,7 @@ export interface User extends UserRequestBody {
 export interface Users {
   id: string
   name: string
-  username: string
+  email: string
   role: string
   password?: string
   createdAt?: number

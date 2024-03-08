@@ -18,25 +18,25 @@ import {
 import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 
 export const addUser = async (req: Request, res: Response): Promise<Response> => {
-  const { name, username, password, role }: UserRequestBody = req.body
+  const { name, email, password, role }: UserRequestBody = req.body
   const id: string = nanoid(12)
 
   try {
     const payloadSchema = z.object({
       name: z.string(),
-      username: z.string(),
+      email: z.string().email(),
       password: z.string(),
       role: z.string()
     })
 
-    payloadSchema.parse({ name, username, password, role })
+    payloadSchema.parse({ name, email, password, role })
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const payload: User = {
       id,
       name,
       password: hashedPassword,
-      username,
+      email,
       role
     }
 
@@ -192,7 +192,7 @@ export const getUser = async (req: Request, res: Response): Promise<Response> =>
 }
 
 export const createSudo = async (req: Request, res: Response): Promise<Response> => {
-  const username = String(process.env.SUDO_USERNAME)
+  const email = String(process.env.SUDO_USERNAME)
   const password = String(process.env.SUDO_PASSWORD)
 
   const hashedPassword = await bcrypt.hash(password, 10)
@@ -204,7 +204,7 @@ export const createSudo = async (req: Request, res: Response): Promise<Response>
       name: 'Super Admin',
       password: hashedPassword,
       role: 'sudo',
-      username
+      email
     })
 
     return res.status(201).json({

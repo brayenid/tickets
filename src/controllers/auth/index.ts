@@ -1,17 +1,17 @@
 import type { Request, Response } from 'express'
 import { AuthError, PrismaError, BadRequestError } from '../../utils/Errors'
-import { getUserByUsernameService } from '../../services/users'
+import { getUserByEmailService } from '../../services/users'
 import bcrypt from 'bcrypt'
 
 export const addSession = async (req: Request, res: Response): Promise<Response> => {
-  const { username, password } = req.body
+  const { email, password } = req.body
 
   try {
     if (req.session.user) {
       throw new BadRequestError('You are logged in')
     }
 
-    const user = await getUserByUsernameService(username as string)
+    const user = await getUserByEmailService(email as string)
 
     if (user.length < 1) {
       return res.status(400).json({
@@ -32,7 +32,7 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
 
     req.session.user = {
       id: user[0].id,
-      username: user[0].username,
+      email: user[0].email,
       name: user[0].name,
       role: user[0].role
     }

@@ -4,7 +4,7 @@ import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 import { prisma, Prisma } from '../../utils/Db'
 
 export const addUserService = async (payload: User): Promise<void> => {
-  const { id, name, password, username, role } = payload
+  const { id, name, password, email, role } = payload
 
   try {
     await prisma.users.create({
@@ -12,14 +12,14 @@ export const addUserService = async (payload: User): Promise<void> => {
         id,
         name,
         password,
-        username,
+        email,
         role
       }
     })
   } catch (error: any) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
-        throw new PrismaError('Username has already taken')
+        throw new PrismaError('Email has already taken')
       }
     }
     throw new Error(error.message as string)
@@ -74,7 +74,7 @@ export const getUsersService = async (search: string = '', limit: number): Promi
         id: true,
         name: true,
         role: true,
-        username: true
+        email: true
       },
       where: {
         AND: [
@@ -98,17 +98,17 @@ export const getUsersService = async (search: string = '', limit: number): Promi
   }
 }
 
-export const getUserByUsernameService = async (username: string): Promise<Users[]> => {
+export const getUserByEmailService = async (email: string): Promise<Users[]> => {
   const user = await prisma.users.findMany({
     select: {
       id: true,
       name: true,
       role: true,
-      username: true,
+      email: true,
       password: true
     },
     where: {
-      username
+      email
     },
     take: 1
   })
@@ -122,7 +122,7 @@ export const getUserByIdService = async (id: string): Promise<Users> => {
       id: true,
       name: true,
       role: true,
-      username: true
+      email: true
     },
     where: {
       id
@@ -137,7 +137,7 @@ export const getUserByIdService = async (id: string): Promise<Users> => {
 }
 
 export const createSudoService = async (payload: User): Promise<void> => {
-  const { id, name, password, role, username } = payload
+  const { id, name, password, role, email } = payload
   const sudo = await prisma.users.findMany({
     where: {
       role: 'sudo'
@@ -155,7 +155,7 @@ export const createSudoService = async (payload: User): Promise<void> => {
       name,
       password,
       role,
-      username
+      email
     }
   })
 }
