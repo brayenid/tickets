@@ -13,7 +13,8 @@ export const addUserService = async (payload: User): Promise<void> => {
         name,
         password,
         email,
-        role
+        role,
+        isActive: true
       }
     })
   } catch (error: any) {

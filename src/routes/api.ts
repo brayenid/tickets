@@ -5,6 +5,8 @@ import { Auth } from '../middlewares/Auth'
 import { patchPassword } from '../controllers/credentials'
 import { addEvent, deleteEvent, getEventById, getEvents, updateEvent } from '../controllers/events'
 import { eventThumbnailMiddleware, updateEventThumbnailMiddleware } from '../middlewares/multer/Event'
+import { addEventPrice, deleteEventPrice, getEventPriceByEventId } from '../controllers/event-prices'
+
 const router: Router = Router()
 
 const auth = new Auth('', [])
@@ -30,5 +32,10 @@ router.get('/events', getEvents)
 router.get('/events/:eventId', getEventById)
 router.put('/events/:eventId', adminAuth.validate, updateEventThumbnailMiddleware, updateEvent)
 router.delete('/events/:eventId', adminAuth.validate, deleteEvent)
+
+/* EVENT PRICE */
+router.post('/event-price', adminAuth.validate, addEventPrice)
+router.get('/event-price/:eventId', getEventPriceByEventId)
+router.delete('/event-price/:eventPriceId', deleteEventPrice)
 
 export default router
