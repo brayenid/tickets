@@ -54,7 +54,8 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 
@@ -88,7 +89,8 @@ export const getEvents = async (req: Request, res: Response): Promise<Response> 
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 
@@ -126,7 +128,8 @@ export const getEventById = async (req: Request, res: Response): Promise<Respons
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 
@@ -185,7 +188,8 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 

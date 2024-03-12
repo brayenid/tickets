@@ -31,7 +31,8 @@ export const addEventPrice = async (req: Request, res: Response): Promise<Respon
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 

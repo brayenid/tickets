@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifikasi Akun Anda</title>
+    <style>
+      /* Reset CSS */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        background-color: #fff;
+      }
+      /* Material Design Colors */
+      .primary-color {
+        background-color: #2196f3;
+        color: #fff;
+      }
+      .accent-color {
+        background-color: #ff4081;
+        color: #fff;
+      }
+      /* Wrapper */
+      .wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      /* Header */
+      .header {
+        text-align: center;
+      }
+      .header h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      /* Content */
+      .content {
+        margin-top: 20px;
+      }
+      .content p {
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      /* Code */
+      .code {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 1.7rem;
+      }
+      /* Button */
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 16px;
+        text-align: center;
+        cursor: pointer;
+      }
+      .button.primary {
+        background-color: #2196f3;
+        color: #fff;
+      }
+      .button.accent {
+        background-color: #ff4081;
+        color: #fff;
+      }
+      /* Footer */
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .footer p {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <h1>Email Verification</h1>
+      </div>
+      <div class="content">
+        <p>Thanks for registering, this is your token verification :</p>
+        <p class="code">{{ message }}</p>
+      </div>
+      <div class="footer">
+        <p>Copyright &copy; 2024 Kita Tiket</p>
+      </div>
+    </div>
+  </body>
+</html>

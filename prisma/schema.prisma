@@ -15,7 +15,9 @@ model Users {
   name      String
   email     String   @unique
   password  String
+  address   String   @default("0")
   role      String   @default("admin")
+  birth     String   @default("1970-01-01")
   avatar    String   @default("null")
   isActive  Boolean  @default(false)
   createdAt DateTime @default(now())

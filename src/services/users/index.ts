@@ -1,10 +1,10 @@
-import type { User, Users } from '../../interfaces/Users'
+import type { User, Users, UserUpdate } from '../../interfaces/Users'
 import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 
 import { prisma, Prisma } from '../../utils/Db'
 
 export const addUserService = async (payload: User): Promise<void> => {
-  const { id, name, password, email, role } = payload
+  const { id, name, password, email, role, isActive, address, birth } = payload
 
   try {
     await prisma.users.create({
@@ -14,7 +14,9 @@ export const addUserService = async (payload: User): Promise<void> => {
         password,
         email,
         role,
-        isActive: true
+        isActive,
+        address,
+        birth
       }
     })
   } catch (error: any) {
@@ -27,8 +29,9 @@ export const addUserService = async (payload: User): Promise<void> => {
   }
 }
 
-export const updateUserService = async (id: string, payload: { name: string }): Promise<void> => {
-  const { name } = payload
+export const updateUserService = async (id: string | undefined, payload: UserUpdate): Promise<void> => {
+  const { name, address, birth } = payload
+  const currentTime = new Date()
 
   try {
     await prisma.users.update({
@@ -36,7 +39,10 @@ export const updateUserService = async (id: string, payload: { name: string }): 
         id
       },
       data: {
-        name
+        name,
+        address,
+        birth,
+        updatedAt: currentTime
       }
     })
   } catch (error: any) {
@@ -99,8 +105,8 @@ export const getUsersService = async (search: string = '', limit: number): Promi
   }
 }
 
-export const getUserByEmailService = async (email: string): Promise<Users[]> => {
-  const user = await prisma.users.findMany({
+export const getUserByEmailService = async (email: string): Promise<Users | null> => {
+  const user = await prisma.users.findUnique({
     select: {
       id: true,
       name: true,
@@ -110,15 +116,14 @@ export const getUserByEmailService = async (email: string): Promise<Users[]> => 
     },
     where: {
       email
-    },
-    take: 1
+    }
   })
 
   return user
 }
 
 export const getUserByIdService = async (id: string): Promise<Users> => {
-  const user = await prisma.users.findMany({
+  const user = await prisma.users.findUnique({
     select: {
       id: true,
       name: true,
@@ -130,11 +135,11 @@ export const getUserByIdService = async (id: string): Promise<Users> => {
     }
   })
 
-  if (user.length < 1) {
+  if (!user) {
     throw new NotFoundError('Account does not exist')
   }
 
-  return user[0]
+  return user
 }
 
 export const createSudoService = async (payload: User): Promise<void> => {

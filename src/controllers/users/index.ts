@@ -19,7 +19,7 @@ import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 
 export const addUser = async (req: Request, res: Response): Promise<Response> => {
   const { name, email, password, role }: UserRequestBody = req.body
-  const id: string = nanoid(12)
+  const id: string = nanoid(16)
 
   try {
     const payloadSchema = z.object({
@@ -37,7 +37,8 @@ export const addUser = async (req: Request, res: Response): Promise<Response> =>
       name,
       password: hashedPassword,
       email,
-      role
+      role,
+      isActive: true
     }
 
     await addUserService(payload)
@@ -50,7 +51,8 @@ export const addUser = async (req: Request, res: Response): Promise<Response> =>
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 
@@ -81,7 +83,11 @@ export const updateUser = async (req: Request, res: Response): Promise<Response>
       name
     })
 
-    await updateUserService(userId, { name })
+    await updateUserService(userId, {
+      name,
+      address: '0',
+      birth: '1970-01-01'
+    })
 
     return res.status(200).json({
       status: 'success',
@@ -91,7 +97,8 @@ export const updateUser = async (req: Request, res: Response): Promise<Response>
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 

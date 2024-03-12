@@ -11,7 +11,7 @@ import { prisma } from '../utils/Db'
  */
 
 class Auth {
-  constructor(public role: string, public fallbackRole: string[]) {
+  constructor(public role: string, public fallbackRole: string[] = []) {
     this.role = role
     this.fallbackRole = fallbackRole
   }

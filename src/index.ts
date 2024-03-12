@@ -1,21 +1,17 @@
-import express, { type Express } from 'express'
+import express, { type Express, type Request, type Response } from 'express'
 import dotenv from 'dotenv'
 import apiRoutes from './routes/api'
 import session from 'express-session'
 import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 import { prisma } from './utils/Db'
-import { rateLimit } from 'express-rate-limit'
+import { engine } from 'express-handlebars'
+import { limit } from './utils/RateLimiter'
 
 dotenv.config()
 
 const app: Express = express()
 const port: number | string = process.env.PORT ?? 3000
-const limiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minutes
-  limit: 150, // Limit each IP to 150 requests per `window` (here, per 1 minutes).
-  standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
-  legacyHeaders: false // Disable the `X-RateLimit-*` headers.
-})
+const limiter = limit(10)
 
 app.use(limiter)
 app.use(express.static('public'))
@@ -49,7 +45,18 @@ declare module 'express-session' {
   }
 }
 
+app.engine('handlebars', engine())
+app.engine('handlebars', engine())
+app.set('view engine', 'handlebars')
+app.set('views', './src/views')
+
 app.use('/api', apiRoutes)
+
+app.use((req: Request, res: Response) => {
+  res.render('not-found', {
+    layout: false
+  })
+})
 
 app.listen(port, (): void => {
   console.log(`Server is running on http://localhost:${port}`)

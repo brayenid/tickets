@@ -7,7 +7,7 @@ export const patchPasswordService = async (payload: Credential): Promise<void> =
   const { id, newPassword, oldPassword } = payload
   const currentTime = new Date()
 
-  const account = await prisma.users.findMany({
+  const account = await prisma.users.findUnique({
     where: {
       id
     },
@@ -16,11 +16,11 @@ export const patchPasswordService = async (payload: Credential): Promise<void> =
     }
   })
 
-  if (account.length < 1) {
+  if (!account) {
     throw new PrismaError('Account does not exist')
   }
 
-  const isMatched = await bcrypt.compare(oldPassword, account[0].password)
+  const isMatched = await bcrypt.compare(oldPassword, account.password)
 
   if (!isMatched) {
     throw new AuthError('Password is not matched')
