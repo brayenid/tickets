@@ -11,17 +11,19 @@ datasource db {
 }
 
 model Users {
-  id        String   @id
-  name      String
-  email     String   @unique
-  password  String
-  address   String   @default("0")
-  role      String   @default("admin")
-  birth     String   @default("1970-01-01")
-  avatar    String   @default("null")
-  isActive  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id           String         @id
+  name         String
+  email        String         @unique
+  password     String
+  address      String         @default("0")
+  role         String         @default("admin")
+  birth        String         @default("1970-01-01")
+  avatar       String         @default("null")
+  isActive     Boolean        @default(false)
+  gender       String         @default("unknown")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  Transactions Transactions[]
 }
 
 model Session {
@@ -32,17 +34,18 @@ model Session {
 }
 
 model Events {
-  id          String        @id
-  name        String
-  location    String
-  date        String
-  description String
-  isOpen      Boolean       @default(true)
-  isSale      Boolean       @default(false)
-  thumbnail   String        @default("null")
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @default(now())
-  EventPrices EventPrices[]
+  id           String         @id
+  name         String
+  location     String
+  date         String
+  description  String
+  isOpen       Boolean        @default(true)
+  isSale       Boolean        @default(false)
+  thumbnail    String         @default("null")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  EventPrices  EventPrices[]
+  Transactions Transactions[]
 }
 
 model EventPrices {
@@ -51,6 +54,19 @@ model EventPrices {
   price     Int
   event     Events   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Transactions {
+  id        String   @id
+  amount    Int
+  quantity  Int
+  event     Events   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  status    String   @default("pending")
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }

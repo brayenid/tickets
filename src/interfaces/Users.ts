@@ -5,6 +5,7 @@ export interface UserRequestBody {
   role: string
   address?: string
   birth?: string
+  registerId?: string
 }
 
 export interface User extends UserRequestBody {

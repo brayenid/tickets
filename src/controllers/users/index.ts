@@ -13,6 +13,7 @@ import {
   deleteUserService,
   getUserByIdService,
   getUsersService,
+  resetUserPasswordService,
   updateUserService
 } from '../../services/users'
 import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
@@ -229,6 +230,42 @@ export const createSudo = async (req: Request, res: Response): Promise<Response>
     return res.status(500).json({
       status: 'fail',
       error: error.message
+    })
+  }
+}
+
+export const resetUserPassword = async (req: Request, res: Response): Promise<Response> => {
+  const { id, password } = req.body
+  const hashedPassword = await bcrypt.hash(password as string, 10)
+
+  try {
+    await resetUserPasswordService(id as string, hashedPassword)
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Password successfully changed'
+    })
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Bad payload',
+        issues: error.issues
+      })
+    }
+
+    if (error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    console.log(error.message)
+
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
     })
   }
 }

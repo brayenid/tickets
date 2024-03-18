@@ -165,3 +165,17 @@ export const createSudoService = async (payload: User): Promise<void> => {
     }
   })
 }
+
+export const resetUserPasswordService = async (id: string, password: string): Promise<void> => {
+  const currentTime = new Date()
+
+  await prisma.users.update({
+    data: {
+      password,
+      updatedAt: currentTime
+    },
+    where: {
+      id
+    }
+  })
+}

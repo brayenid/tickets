@@ -4,7 +4,8 @@ import { nanoid } from 'nanoid'
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
 import { addUserService, updateUserService } from '../../services/users'
-import { PrismaError } from '../../utils/Errors'
+import { BadRequestError, PrismaError } from '../../utils/Errors'
+import { verifyEmailToTokenId } from '../../services/email-verification'
 
 /*
 Only for customer, but for several functions,
@@ -13,7 +14,7 @@ it uses the same functions as the "users" used
 */
 
 export const addCustomer = async (req: Request, res: Response): Promise<Response> => {
-  const { name, email, password, address, birth }: UserRequestBody = req.body
+  const { name, email, password, address, birth, registerId }: UserRequestBody = req.body
   const id: string = nanoid(16)
 
   try {
@@ -22,10 +23,14 @@ export const addCustomer = async (req: Request, res: Response): Promise<Response
       email: z.string().email(),
       password: z.string(),
       birth: z.string(),
-      address: z.string()
+      address: z.string(),
+      registerId: z.string()
     })
 
-    payloadSchema.parse({ name, email, password, address, birth })
+    payloadSchema.parse({ name, email, password, address, birth, registerId })
+
+    await verifyEmailToTokenId({ email, id: registerId })
+
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const payload: User = {
@@ -54,7 +59,7 @@ export const addCustomer = async (req: Request, res: Response): Promise<Response
       })
     }
 
-    if (error instanceof PrismaError) {
+    if (error instanceof PrismaError || error instanceof BadRequestError) {
       return res.status(400).json({
         status: 'fail',
         message: error.message
