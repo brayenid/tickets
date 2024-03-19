@@ -25,6 +25,23 @@ export const addEventPriceService = async (payload: EventPricePayload): Promise<
   }
 }
 
+export const getEventPriceByIdService = async (id: string): Promise<EventPricePayload> => {
+  const eventPrices = await prisma.eventPrices.findFirst({
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      eventId: true
+    },
+    where: {
+      id
+    },
+    take: 1
+  })
+
+  return eventPrices as EventPricePayload
+}
+
 export const getEventPriceByEventIdService = async (eventId: string): Promise<EventPricePayload[]> => {
   const eventPrices = await prisma.eventPrices.findMany({
     select: {

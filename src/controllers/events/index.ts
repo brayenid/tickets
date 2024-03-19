@@ -15,7 +15,7 @@ import type { FileRequest } from '../../interfaces/Express'
 import path from 'path'
 
 export const addEvent = async (req: FileRequest, res: Response): Promise<Response> => {
-  const { name, date, description, location }: EventBasic = req.body
+  const { name, date, description, location, vendor }: EventBasic = req.body
   const thumbnail = getUrlPath(req.file, 8, 9)
 
   const id: string = req.fileId ?? ''
@@ -31,17 +31,19 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
       name: z.string(),
       date: z.string(),
       description: z.string(),
-      location: z.string()
+      location: z.string(),
+      vendor: z.string()
     })
 
     eventSchema.parse({
       name,
       date,
       description,
-      location
+      location,
+      vendor
     })
 
-    await addEventService({ name, date, description, location, id, thumbnail })
+    await addEventService({ name, date, description, location, id, thumbnail, vendor })
 
     return res.status(200).json({
       status: 'success',
@@ -157,7 +159,7 @@ export const getEventById = async (req: Request, res: Response): Promise<Respons
 }
 
 export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
-  const { date, description, location, name } = req.body
+  const { date, description, location, name, vendor } = req.body
   const { eventId: id } = req.params
 
   try {
@@ -165,17 +167,19 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       name: z.string(),
       date: z.string(),
       description: z.string(),
-      location: z.string()
+      location: z.string(),
+      vendor: z.string()
     })
 
     eventSchema.parse({
       name,
       date,
       description,
-      location
+      location,
+      vendor
     })
 
-    await updateEventService({ id, date, description, location, name })
+    await updateEventService({ id, date, description, location, name, vendor })
 
     return res.status(200).json({
       status: 'success',

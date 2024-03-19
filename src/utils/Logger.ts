@@ -15,7 +15,7 @@ const logger = winston.createLogger({
       )
     }),
     // Menambahkan transport untuk file
-    new winston.transports.File({ filename: 'app.log' })
+    new winston.transports.File({ filename: 'error.log' })
   ]
 })
 

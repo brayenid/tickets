@@ -1,5 +1,6 @@
 export interface EventBasic {
   name: string
+  vendor: string
   location: string
   date: string
   description: string

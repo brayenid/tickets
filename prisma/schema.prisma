@@ -36,6 +36,7 @@ model Session {
 model Events {
   id           String         @id
   name         String
+  vendor       String         @default("Kita Tiket")
   location     String
   date         String
   description  String
@@ -59,14 +60,26 @@ model EventPrices {
 }
 
 model Transactions {
-  id        String   @id
+  id        String    @id @default(cuid())
+  orderId   String
   amount    Int
   quantity  Int
-  event     Events   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  category  String    @default("basic")
+  event     Events    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId   String
-  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source    String
   userId    String
-  status    String   @default("pending")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  status    String    @default("pending")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  Tickets   Tickets[]
+}
+
+model Tickets {
+  id            String       @id
+  transaction   Transactions @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transactionId String
+  isActive      Boolean      @default(false)
+  createdAt     DateTime     @default(now())
 }

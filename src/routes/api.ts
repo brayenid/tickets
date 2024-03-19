@@ -9,6 +9,8 @@ import { addEventPrice, deleteEventPrice, getEventPriceByEventId } from '../cont
 import { addEmailVerification, verifyEmailActivation } from '../controllers/account-email-verification'
 import { addCustomer, updateCustomer } from '../controllers/customer-acc'
 import { limit } from '../utils/RateLimiter'
+import { addTransaction } from '../controllers/transactions'
+import { processTransactionNotif } from '../controllers/transactions/notification'
 
 const router: Router = Router()
 
@@ -53,5 +55,11 @@ router.get('/events', getEvents)
 router.get('/events/:eventId', getEventById)
 router.put('/events/:eventId', adminAuth.validate, updateEventThumbnailMiddleware, updateEvent)
 router.delete('/events/:eventId', adminAuth.validate, deleteEvent)
+
+/* TRANSACTIONS */
+router.post('/transaction', customerAuth.validate, addTransaction)
+
+/* TRANSACTION NOTIF */
+router.post('/notification/transaction', processTransactionNotif)
 
 export default router

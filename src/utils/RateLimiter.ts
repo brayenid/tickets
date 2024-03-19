@@ -1,4 +1,5 @@
 import rateLimit, { type RateLimitRequestHandler } from 'express-rate-limit'
+import { config } from './Config'
 
 /**
  * Express rate limiter
@@ -10,6 +11,10 @@ export const limit = (request: number): RateLimitRequestHandler => {
     windowMs: 60 * 1000, // 1 minutes
     limit: request, // Limit each IP to 100 requests per `window` (here, per 1 minutes).
     standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
-    legacyHeaders: false // Disable the `X-RateLimit-*` headers.
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+    validate: {
+      trustProxy: config.env === 'dev',
+      xForwardedForHeader: config.env !== 'dev'
+    }
   })
 }

@@ -3,7 +3,7 @@ import { Prisma, prisma } from '../../utils/Db'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 
 export const addEventService = async (payload: EventPayload): Promise<void> => {
-  const { id, date, description, location, name, thumbnail } = payload
+  const { id, date, description, location, name, thumbnail, vendor } = payload
 
   try {
     await prisma.events.create({
@@ -13,7 +13,8 @@ export const addEventService = async (payload: EventPayload): Promise<void> => {
         description,
         location,
         name,
-        thumbnail
+        thumbnail,
+        vendor
       }
     })
   } catch (error: any) {
@@ -42,7 +43,8 @@ export const getEventsService = async (
       location: true,
       date: true,
       description: true,
-      thumbnail: true
+      thumbnail: true,
+      vendor: true
     },
     where: {
       OR: [
@@ -53,6 +55,11 @@ export const getEventsService = async (
         },
         {
           location: {
+            contains: search
+          }
+        },
+        {
+          vendor: {
             contains: search
           }
         }
@@ -81,7 +88,7 @@ export const getEventByIdService = async (id: string): Promise<EventPayload[]> =
 }
 
 export const updateEventService = async (payload: EventPayload): Promise<void> => {
-  const { id, date, description, location, name } = payload
+  const { id, date, description, location, name, vendor } = payload
   const currentTime = new Date()
 
   const getEventInfo = await prisma.events.findMany({
@@ -103,7 +110,8 @@ export const updateEventService = async (payload: EventPayload): Promise<void> =
       description,
       location,
       name,
-      updatedAt: currentTime
+      updatedAt: currentTime,
+      vendor
     },
     where: {
       id
