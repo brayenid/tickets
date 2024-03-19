@@ -5,6 +5,7 @@ import { generateRandomNumbers } from '../../utils/NumberGenerator'
 import { z } from 'zod'
 import { setKeyService, verifyEmailToKey } from '../../services/email-verification'
 import { nanoid } from 'nanoid'
+import { getUserByEmailService } from '../../services/users'
 
 export const addEmailVerification = async (req: Request, res: Response): Promise<Response> => {
   const { email } = req.body
@@ -16,6 +17,12 @@ export const addEmailVerification = async (req: Request, res: Response): Promise
     })
 
     payloadSchema.parse({ email })
+
+    const user = await getUserByEmailService(email as string)
+    if (user) {
+      throw new BadRequestError('Email already taken')
+    }
+
     await setKeyService({ email, key })
     await sendEmailService({
       target: email as string,

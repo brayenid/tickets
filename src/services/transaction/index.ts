@@ -2,6 +2,7 @@ import { MidtransError } from 'midtrans-client'
 import type { MidtransPayload, MidtransSnap, MidtransResponse } from '../../interfaces/Midtrans'
 import { prisma } from '../../utils/Db'
 import { midtrans } from '../../utils/Midtrans'
+import type { Transaction } from '../../interfaces/Transaction'
 
 export const addTransactionService = async (payload: MidtransPayload): Promise<MidtransResponse | undefined> => {
   const { id, fee, customer, event, items } = payload
@@ -15,7 +16,7 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
   const itemsMidtransMapped = items.map((item) => {
     return {
       id: item.id,
-      name: item.name,
+      name: `${item.name} - ${item.category}`,
       category: item.category,
       price: item.price,
       quantity: item.quantity
@@ -54,6 +55,7 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
     /* RE-MAP ARRAY OF ITEMS THAT FE SENT, AND WILL BE STORED TO DB */
     const itemsForDBMapped = items.map((item) => {
       return {
+        id: item.id,
         orderId: item.orderId ?? '',
         amount: item.price,
         quantity: item.quantity,
@@ -101,18 +103,30 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
   }
 }
 
-export const getLatestIdNumber = async (): Promise<string> => {
-  const latestId =
-    (
-      await prisma.transactions.findFirst({
-        select: {
-          id: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      })
-    )?.id ?? ''
+export const updateTransactionByOrderIdService = async (
+  orderId: string,
+  status: string,
+  source: string
+): Promise<void> => {
+  const currentTime = new Date()
+  await prisma.transactions.updateMany({
+    data: {
+      status,
+      source,
+      updatedAt: currentTime
+    },
+    where: {
+      orderId
+    }
+  })
+}
 
-  return latestId
+export const getTransactionByOrderIdService = async (orderId: string): Promise<Transaction[]> => {
+  const transactions = await prisma.transactions.findMany({
+    where: {
+      orderId
+    }
+  })
+
+  return transactions
 }

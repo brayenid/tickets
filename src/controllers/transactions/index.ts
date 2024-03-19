@@ -1,12 +1,11 @@
 import type { Request, Response } from 'express'
-import { nanoid } from 'nanoid'
 import type * as Midtrans from '../../interfaces/Midtrans'
 import { config } from '../../utils/Config'
 import { z } from 'zod'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 import { getEventPriceByIdService } from '../../services/event-prices'
 import { addTransactionService } from '../../services/transaction'
-import { generateId } from '../../utils/OrderId'
+import { generateId } from '../../utils/IDGenerator'
 
 export const addTransaction = async (req: Request, res: Response): Promise<Response> => {
   const { event, items } = req.body
@@ -40,7 +39,7 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
       }
     }
 
-    const id = generateId('KL')
+    const id = generateId('OID')
     const fee = config.transaction.fee
 
     /* THIS ARRAY WILL BE USED IN MIDTRANS API AND STORED TO DB */
@@ -52,7 +51,7 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
         const { name, price } = await getEventPriceByIdService(item.eventPriceId)
 
         return {
-          id: nanoid(18),
+          id: generateId('TID'),
           orderId: id,
           name: event?.name,
           price,

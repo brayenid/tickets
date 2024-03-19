@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express'
 import type { User, UserRequestBody } from '../../interfaces/Users'
-import { nanoid } from 'nanoid'
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
 import { addUserService, updateUserService } from '../../services/users'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 import { verifyEmailToTokenId } from '../../services/email-verification'
+import { generateIdSimple } from '../../utils/IDGenerator'
 
 /*
 Only for customer, but for several functions,
@@ -15,7 +15,7 @@ it uses the same functions as the "users" used
 
 export const addCustomer = async (req: Request, res: Response): Promise<Response> => {
   const { name, email, password, address, birth, registerId }: UserRequestBody = req.body
-  const id: string = nanoid(16)
+  const id: string = generateIdSimple(24)
 
   try {
     const payloadSchema = z.object({

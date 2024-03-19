@@ -67,8 +67,8 @@ model Transactions {
   category  String    @default("basic")
   event     Events    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId   String
-  user      Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
   source    String
+  user      Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   status    String    @default("pending")
   createdAt DateTime  @default(now())
@@ -82,4 +82,5 @@ model Tickets {
   transactionId String
   isActive      Boolean      @default(false)
   createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now())
 }
