@@ -47,7 +47,8 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
     await addOrderService({
       id,
       eventId: event.id,
-      userId: customer.id
+      userId: customer.id,
+      source: 'online'
     })
 
     /* THIS ARRAY WILL BE USED IN MIDTRANS API AND STORED TO DB */

@@ -60,8 +60,7 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
         amount: item.price,
         quantity: item.quantity,
         category: item.category,
-        eventPriceId: item.eventPriceId,
-        source: 'online'
+        eventPriceId: item.eventPriceId
       }
     })
 
@@ -119,24 +118,6 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
     throw new Error('Server error')
   }
 }
-
-// export const updateTransactionByOrderIdService = async (
-//   orderId: string,
-//   status: string,
-//   source: string
-// ): Promise<void> => {
-//   const currentTime = new Date()
-//   await prisma.transactions.updateMany({
-//     data: {
-//       status,
-//       source,
-//       updatedAt: currentTime
-//     },
-//     where: {
-//       orderId
-//     }
-//   })
-// }
 
 export const getTransactionByOrderIdService = async (orderId: string): Promise<Transaction[]> => {
   const transactions = await prisma.transactions.findMany({

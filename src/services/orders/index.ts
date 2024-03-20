@@ -2,7 +2,7 @@ import type { OrderPayload } from '../../interfaces/Order'
 import { prisma } from '../../utils/Db'
 
 export const addOrderService = async (payload: OrderPayload): Promise<void> => {
-  const { id, eventId, userId } = payload
+  const { id, eventId, userId, source } = payload
 
   try {
     await prisma.$transaction(async (prismaClient) => {
@@ -10,7 +10,8 @@ export const addOrderService = async (payload: OrderPayload): Promise<void> => {
         data: {
           id,
           eventId: String(eventId),
-          userId: String(userId)
+          userId: String(userId),
+          source: String(source)
         }
       })
     })
