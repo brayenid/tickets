@@ -77,12 +77,12 @@ export const getEventsService = async (
   return events
 }
 
-export const getEventByIdService = async (id: string): Promise<EventPayload[]> => {
-  const event = await prisma.events.findMany({
+export const getEventByIdService = async (id: string): Promise<EventPayload> => {
+  const event = (await prisma.events.findUnique({
     where: {
       id
     }
-  })
+  })) as EventPayload
 
   return event
 }

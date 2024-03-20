@@ -5,6 +5,7 @@ export interface ItemDetails {
   category: string
   price: number
   name: string
+  eventPriceId?: string
 }
 
 export interface ItemsByClient {
@@ -37,7 +38,6 @@ export interface Customer {
 
 export interface MidtransPayload {
   id?: string
-  event: Event
   quantity?: number
   price?: number
   fee?: number

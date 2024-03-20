@@ -6,6 +6,8 @@ import { BadRequestError, PrismaError } from '../../utils/Errors'
 import { getEventPriceByIdService } from '../../services/event-prices'
 import { addTransactionService } from '../../services/transaction'
 import { generateId } from '../../utils/IDGenerator'
+import { addOrderService, updateOrderService } from '../../services/orders'
+import { getEventByIdService } from '../../services/events'
 
 export const addTransaction = async (req: Request, res: Response): Promise<Response> => {
   const { event, items } = req.body
@@ -14,8 +16,7 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
   try {
     const midtransSchema = z.object({
       event: z.object({
-        id: z.string(),
-        name: z.string()
+        id: z.string()
       }),
       items: z.array(
         z.object({
@@ -42,6 +43,13 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
     const id = generateId('OID')
     const fee = config.transaction.fee
 
+    /* CREATE AN ORDER ID RECORD */
+    await addOrderService({
+      id,
+      eventId: event.id,
+      userId: customer.id
+    })
+
     /* THIS ARRAY WILL BE USED IN MIDTRANS API AND STORED TO DB */
     const itemsMapped = await Promise.all(
       items.map(async (item: Midtrans.ItemsByClient) => {
@@ -49,14 +57,16 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
           throw new Error('ID could not be empty')
         }
         const { name, price } = await getEventPriceByIdService(item.eventPriceId)
+        const { name: eventName } = await getEventByIdService(event.id as string)
 
         return {
           id: generateId('TID'),
           orderId: id,
-          name: event?.name,
+          name: eventName,
           price,
           quantity: item.quantity,
-          category: name
+          category: name,
+          eventPriceId: item.eventPriceId
         }
       })
     )
@@ -65,11 +75,16 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
       id,
       fee,
       customer,
-      event,
       items: itemsMapped
     }
 
     const transactionToken = await addTransactionService(payload)
+    /* UPDATE ORDER ID THAT CREATED BEFORE WITH PAYMENT TOKEN AND REDIRECT URL */
+    await updateOrderService({
+      id,
+      paymentToken: transactionToken?.token,
+      redirectUrl: transactionToken?.redirectUrl
+    })
 
     return res.status(201).json({
       status: 'success',

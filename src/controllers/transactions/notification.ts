@@ -3,10 +3,29 @@ import { createHash } from '../../utils/Hash'
 import { config } from '../../utils/Config'
 import { AuthError, BadRequestError } from '../../utils/Errors'
 import { logger } from '../../utils/Logger'
-import { getTransactionByOrderIdService, updateTransactionByOrderIdService } from '../../services/transaction'
+import { getTransactionByOrderIdService } from '../../services/transaction'
 import { addTicketService } from '../../services/tickets'
 import type { TicketPayload } from '../../interfaces/Tickets'
 import { generateId } from '../../utils/IDGenerator'
+import { operateEventPriceStocKService } from '../../services/event-prices'
+import type { Transaction } from '../../interfaces/Transaction'
+import { updateOrderStatusService } from '../../services/orders'
+
+/**
+ *
+ * This will undo event price stock value
+ */
+const operateStock = async (transactions: Transaction[]): Promise<void> => {
+  // LOOP THROUGH EACH TRANSACTION OBJECT
+  for (let i = 0; i < transactions.length; i++) {
+    const { quantity, eventPriceId } = transactions[i]
+
+    // ANOTHER LOOP TO DO AN OPERATION
+    for (let j = 0; j < (quantity ?? 0); j++) {
+      await operateEventPriceStocKService(eventPriceId ?? '', 'add')
+    }
+  }
+}
 
 export const processTransactionNotif = async (req: Request, res: Response): Promise<Response> => {
   const {
@@ -35,7 +54,11 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
     const isRefunded = transactionStatus === 'refund'
 
     if (isSettled) {
-      await updateTransactionByOrderIdService(orderId as string, 'settlement', source as string)
+      await updateOrderStatusService({
+        id: orderId,
+        source,
+        status: 'settlement'
+      })
 
       const transactions = await getTransactionByOrderIdService(orderId as string)
 
@@ -58,11 +81,31 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
 
       await addTicketService(ticketsArr)
     } else if (isFailed) {
-      await updateTransactionByOrderIdService(orderId as string, 'failed', source as string)
+      await updateOrderStatusService({
+        id: orderId,
+        source,
+        status: 'failed'
+      })
+
+      const transactions = await getTransactionByOrderIdService(orderId as string)
+
+      await operateStock(transactions)
     } else if (isExpired) {
-      await updateTransactionByOrderIdService(orderId as string, 'expired', source as string)
+      await updateOrderStatusService({
+        id: orderId,
+        source,
+        status: 'expired'
+      })
+
+      const transactions = await getTransactionByOrderIdService(orderId as string)
+
+      await operateStock(transactions)
     } else if (isRefunded) {
-      await updateTransactionByOrderIdService(orderId as string, 'refunded', source as string)
+      await updateOrderStatusService({
+        id: orderId,
+        source,
+        status: 'refunded'
+      })
     }
 
     return res.status(200).json({

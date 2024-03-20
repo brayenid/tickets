@@ -2,16 +2,19 @@ import type { EventPricePayload } from '../../interfaces/EventPrice'
 import { Prisma, prisma } from '../../utils/Db'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 
+type Operation = 'min' | 'add'
+
 export const addEventPriceService = async (payload: EventPricePayload): Promise<void> => {
   try {
-    const { id, name, eventId, price } = payload
+    const { id, name, eventId, price, stock } = payload
 
     await prisma.eventPrices.create({
       data: {
         id,
         name,
         price,
-        eventId
+        eventId,
+        stock
       }
     })
   } catch (error: any) {
@@ -31,13 +34,18 @@ export const getEventPriceByIdService = async (id: string): Promise<EventPricePa
       id: true,
       name: true,
       price: true,
-      eventId: true
+      eventId: true,
+      stock: true
     },
     where: {
       id
     },
     take: 1
   })
+
+  if (!eventPrices) {
+    throw new BadRequestError('Invalid event price')
+  }
 
   return eventPrices as EventPricePayload
 }
@@ -48,7 +56,8 @@ export const getEventPriceByEventIdService = async (eventId: string): Promise<Ev
       id: true,
       name: true,
       price: true,
-      eventId: true
+      eventId: true,
+      stock: true
     },
     where: {
       eventId
@@ -78,4 +87,30 @@ export const deleteEventPriceService = async (id: string): Promise<void> => {
       id
     }
   })
+}
+
+export const operateEventPriceStocKService = async (eventPriceId: string, operation: Operation): Promise<void> => {
+  if (operation === 'min') {
+    await prisma.eventPrices.update({
+      data: {
+        stock: {
+          decrement: 1
+        }
+      },
+      where: {
+        id: eventPriceId
+      }
+    })
+  } else if (operation === 'add') {
+    await prisma.eventPrices.update({
+      data: {
+        stock: {
+          increment: 1
+        }
+      },
+      where: {
+        id: eventPriceId
+      }
+    })
+  }
 }

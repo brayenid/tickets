@@ -5,7 +5,7 @@ import { midtrans } from '../../utils/Midtrans'
 import type { Transaction } from '../../interfaces/Transaction'
 
 export const addTransactionService = async (payload: MidtransPayload): Promise<MidtransResponse | undefined> => {
-  const { id, fee, customer, event, items } = payload
+  const { id, fee, customer, items } = payload
 
   /* SUM TOTAL PRICE OF ITEMS AND ADD FEE */
   const countTotalAmount = items.reduce((a, b) => {
@@ -59,9 +59,8 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
         orderId: item.orderId ?? '',
         amount: item.price,
         quantity: item.quantity,
-        eventId: event.id,
-        userId: customer.id,
         category: item.category,
+        eventPriceId: item.eventPriceId,
         source: 'online'
       }
     })
@@ -75,7 +74,25 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
     await prisma.$transaction(async (prismaClient) => {
       for (const item of itemsForDBMapped) {
         await prismaClient.transactions.create({
-          data: item
+          data: {
+            id: item.id,
+            orderId: item.orderId,
+            amount: item.amount,
+            eventPriceId: item.eventPriceId,
+            quantity: item.quantity,
+            category: item.category
+          }
+        })
+
+        await prismaClient.eventPrices.update({
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          },
+          where: {
+            id: item.eventPriceId
+          }
         })
       }
 
@@ -103,23 +120,23 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
   }
 }
 
-export const updateTransactionByOrderIdService = async (
-  orderId: string,
-  status: string,
-  source: string
-): Promise<void> => {
-  const currentTime = new Date()
-  await prisma.transactions.updateMany({
-    data: {
-      status,
-      source,
-      updatedAt: currentTime
-    },
-    where: {
-      orderId
-    }
-  })
-}
+// export const updateTransactionByOrderIdService = async (
+//   orderId: string,
+//   status: string,
+//   source: string
+// ): Promise<void> => {
+//   const currentTime = new Date()
+//   await prisma.transactions.updateMany({
+//     data: {
+//       status,
+//       source,
+//       updatedAt: currentTime
+//     },
+//     where: {
+//       orderId
+//     }
+//   })
+// }
 
 export const getTransactionByOrderIdService = async (orderId: string): Promise<Transaction[]> => {
   const transactions = await prisma.transactions.findMany({

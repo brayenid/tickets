@@ -118,7 +118,7 @@ export const getEventById = async (req: Request, res: Response): Promise<Respons
   try {
     const eventDetail = await getEventByIdService(eventId)
 
-    if (eventDetail.length < 1) {
+    if (!eventDetail) {
       throw new NotFoundError('This events is not available')
     }
 
