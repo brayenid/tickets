@@ -6,12 +6,15 @@ import { BadRequestError, PrismaError } from '../../utils/Errors'
 import { getEventPriceByIdService } from '../../services/event-prices'
 import { addTransactionService } from '../../services/transaction'
 import { generateId } from '../../utils/IDGenerator'
-import { addOrderService, updateOrderService } from '../../services/orders'
+import { addOrderService, deleteOrderService, updateOrderService } from '../../services/orders'
 import { getEventByIdService } from '../../services/events'
 
 export const addTransaction = async (req: Request, res: Response): Promise<Response> => {
   const { event, items } = req.body
   const session = req.session.user
+
+  const id = generateId('OID')
+  const fee = config.transaction.fee
 
   try {
     const midtransSchema = z.object({
@@ -39,9 +42,6 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
         address: 'Sendawar'
       }
     }
-
-    const id = generateId('OID')
-    const fee = config.transaction.fee
 
     /* CREATE AN ORDER ID RECORD */
     await addOrderService({
@@ -101,7 +101,15 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
       })
     }
 
-    if (error instanceof PrismaError || error instanceof BadRequestError) {
+    if (error instanceof PrismaError) {
+      await deleteOrderService(id)
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof BadRequestError) {
       return res.status(400).json({
         status: 'fail',
         message: error.message

@@ -44,7 +44,7 @@ export const getEventPriceByIdService = async (id: string): Promise<EventPricePa
   })
 
   if (!eventPrices) {
-    throw new BadRequestError('Invalid event price')
+    throw new PrismaError('Invalid event price')
   }
 
   return eventPrices as EventPricePayload
