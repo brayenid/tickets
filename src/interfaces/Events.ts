@@ -11,3 +11,12 @@ export interface EventPayload extends EventBasic {
   id: string
   isOpen?: boolean
 }
+
+export interface EventAttenders {
+  ticketId: string
+  user: {
+    id: string
+    name: string
+    age: number
+  }
+}

@@ -6,7 +6,7 @@ import { BadRequestError, PrismaError } from '../../utils/Errors'
 import { getEventPriceByIdService } from '../../services/event-prices'
 import { addTransactionService } from '../../services/transaction'
 import { generateId } from '../../utils/IDGenerator'
-import { addOrderService, deleteOrderService, updateOrderService } from '../../services/orders'
+import { addOrderService, deleteOrderService, getOrderByIdService, updateOrderService } from '../../services/orders'
 import { getEventByIdService } from '../../services/events'
 
 export const addTransaction = async (req: Request, res: Response): Promise<Response> => {
@@ -93,6 +93,16 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
       data: transactionToken
     })
   } catch (error: any) {
+    /*
+    ERROR POSSIBILITY :
+    - Invalid Event ID
+    - Invalid Price ID
+    */
+    const getOrderToDelete = await getOrderByIdService(id)
+
+    if (getOrderToDelete) {
+      await deleteOrderService(id)
+    }
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
@@ -102,7 +112,6 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
     }
 
     if (error instanceof PrismaError) {
-      await deleteOrderService(id)
       return res.status(400).json({
         status: 'fail',
         message: error.message

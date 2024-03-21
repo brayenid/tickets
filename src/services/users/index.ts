@@ -4,7 +4,7 @@ import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 import { prisma, Prisma } from '../../utils/Db'
 
 export const addUserService = async (payload: User): Promise<void> => {
-  const { id, name, password, email, role, isActive, address, birth } = payload
+  const { id, name, password, email, role, isActive, address, birth, gender } = payload
 
   try {
     await prisma.users.create({
@@ -16,7 +16,8 @@ export const addUserService = async (payload: User): Promise<void> => {
         role,
         isActive,
         address,
-        birth
+        birth,
+        gender
       }
     })
   } catch (error: any) {

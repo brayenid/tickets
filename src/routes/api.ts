@@ -3,7 +3,15 @@ import { addUser, createSudo, deleteUser, getUser, getUsers, resetUserPassword, 
 import { addSession, removeSession } from '../controllers/auth'
 import { Auth } from '../middlewares/Auth'
 import { patchPassword } from '../controllers/credentials'
-import { addEvent, deleteEvent, getEventById, getEvents, updateEvent } from '../controllers/events'
+import {
+  addEvent,
+  deleteEvent,
+  getEventAttenders,
+  getEventAttendersAge,
+  getEventById,
+  getEvents,
+  updateEvent
+} from '../controllers/events'
 import { eventThumbnailMiddleware, updateEventThumbnailMiddleware } from '../middlewares/multer/Event'
 import { addEventPrice, deleteEventPrice, getEventPriceByEventId } from '../controllers/event-prices'
 import { addEmailVerification, verifyEmailActivation } from '../controllers/account-email-verification'
@@ -11,6 +19,7 @@ import { addCustomer, updateCustomer } from '../controllers/customer-acc'
 import { limit } from '../utils/RateLimiter'
 import { addTransaction } from '../controllers/transactions'
 import { processTransactionNotif } from '../controllers/transactions/notification'
+import { getTicketsByUserId } from '../controllers/tickets'
 
 const router: Router = Router()
 
@@ -52,14 +61,19 @@ router.delete('/event-price/:eventPriceId', deleteEventPrice)
 /* EVENTS */
 router.post('/events', adminAuth.validate, eventThumbnailMiddleware, addEvent)
 router.get('/events', getEvents)
-router.get('/events/:eventId', getEventById)
+router.get('/events/detail/:eventId', getEventById)
 router.put('/events/:eventId', adminAuth.validate, updateEventThumbnailMiddleware, updateEvent)
 router.delete('/events/:eventId', adminAuth.validate, deleteEvent)
+router.get('/events/attenders/:eventId', getEventAttenders)
+router.get('/statistic/events/attenders/:eventId', getEventAttendersAge)
 
 /* TRANSACTIONS */
 router.post('/transaction', customerAuth.validate, addTransaction)
 
 /* TRANSACTION NOTIF */
 router.post('/notification/transaction', processTransactionNotif)
+
+/* TICKETS */
+router.get('/tickets', customerAuth.validate, getTicketsByUserId)
 
 export default router

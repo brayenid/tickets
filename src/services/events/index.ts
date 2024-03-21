@@ -1,4 +1,5 @@
-import type { EventPayload } from '../../interfaces/Events'
+import type { EventAttenders, EventPayload } from '../../interfaces/Events'
+import { countAge } from '../../utils/CountAge'
 import { Prisma, prisma } from '../../utils/Db'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 
@@ -143,4 +144,53 @@ export const deleteEventService = async (id: string): Promise<string> => {
   })
 
   return event.thumbnail
+}
+
+export const getEventAttendersService = async (eventId: string): Promise<EventAttenders[]> => {
+  const attenders = await prisma.tickets.findMany({
+    select: {
+      id: true,
+      transaction: {
+        select: {
+          id: true,
+          category: true,
+          order: {
+            select: {
+              id: true,
+              source: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  birth: true,
+                  email: true,
+                  gender: true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    where: {
+      transaction: {
+        order: {
+          eventId
+        }
+      }
+    }
+  })
+
+  const attendersMapped = attenders.map((attender) => {
+    return {
+      ticketId: attender.id,
+      user: {
+        id: attender.transaction.order?.user.id ?? '',
+        name: attender.transaction.order?.user.name ?? '`',
+        age: countAge(attender.transaction.order?.user.birth ?? '')
+      }
+    }
+  })
+
+  return attendersMapped
 }

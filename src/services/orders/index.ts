@@ -26,6 +26,16 @@ export const addOrderService = async (payload: OrderPayload): Promise<void> => {
   }
 }
 
+export const getOrderByIdService = async (id: string): Promise<OrderPayload | null> => {
+  const order = await prisma.orders.findUnique({
+    where: {
+      id
+    }
+  })
+
+  return order
+}
+
 export const updateOrderService = async (payload: OrderPayload): Promise<void> => {
   const { id, paymentToken, redirectUrl } = payload
   const currentTime = new Date()

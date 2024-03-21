@@ -63,7 +63,7 @@ model EventPrices {
 
 model Transactions {
   id           String       @id @default(cuid())
-  Order        Orders?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order        Orders?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId      String?
   amount       Int
   EventPrice   EventPrices? @relation(fields: [eventPriceId], references: [id])

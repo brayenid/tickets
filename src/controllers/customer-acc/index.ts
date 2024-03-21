@@ -14,7 +14,7 @@ it uses the same functions as the "users" used
 */
 
 export const addCustomer = async (req: Request, res: Response): Promise<Response> => {
-  const { name, email, password, address, birth, registerId }: UserRequestBody = req.body
+  const { name, email, password, address, birth, registerId, gender }: UserRequestBody = req.body
   const id: string = generateIdSimple(24)
 
   try {
@@ -24,10 +24,11 @@ export const addCustomer = async (req: Request, res: Response): Promise<Response
       password: z.string(),
       birth: z.string(),
       address: z.string(),
-      registerId: z.string()
+      registerId: z.string(),
+      gender: z.string()
     })
 
-    payloadSchema.parse({ name, email, password, address, birth, registerId })
+    payloadSchema.parse({ name, email, password, address, birth, registerId, gender })
 
     await verifyEmailToTokenId({ email, id: registerId })
 
@@ -41,7 +42,8 @@ export const addCustomer = async (req: Request, res: Response): Promise<Response
       role: 'customer',
       address,
       birth,
-      isActive: true
+      isActive: true,
+      gender
     }
 
     await addUserService(payload)
