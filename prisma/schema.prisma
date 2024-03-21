@@ -50,18 +50,18 @@ model Events {
 }
 
 model EventPrices {
-  id           String         @id
-  name         String
-  price        Int
-  event        Events         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  eventId      String
-  stock        Int
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @default(now())
-  Transactions Transactions[]
+  id         String       @id
+  name       String
+  price      Int
+  event      Events       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId    String
+  stock      Int
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now())
+  OrderItems OrderItems[]
 }
 
-model Transactions {
+model OrderItems {
   id           String       @id @default(cuid())
   order        Orders?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId      String?
@@ -76,25 +76,25 @@ model Transactions {
 }
 
 model Tickets {
-  id            String       @id
-  transaction   Transactions @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  id            String     @id
+  transaction   OrderItems @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   transactionId String
-  isActive      Boolean      @default(false)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now())
+  isActive      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now())
 }
 
 model Orders {
-  id           String         @id
-  paymentToken String         @default("0")
-  redirectUrl  String         @default("0")
-  status       String         @default("pending")
-  source       String         @default("0")
-  event        Events         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id           String       @id
+  paymentToken String       @default("0")
+  redirectUrl  String       @default("0")
+  status       String       @default("pending")
+  source       String       @default("0")
+  event        Events       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId      String
-  user         Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @default(now())
-  Transactions Transactions[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now())
+  OrderItems   OrderItems[]
 }

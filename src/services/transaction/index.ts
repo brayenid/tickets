@@ -72,7 +72,7 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
     /* PRISMA TRANSACTION */
     await prisma.$transaction(async (prismaClient) => {
       for (const item of itemsForDBMapped) {
-        await prismaClient.transactions.create({
+        await prismaClient.orderItems.create({
           data: {
             id: item.id,
             orderId: item.orderId,
@@ -120,7 +120,7 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
 }
 
 export const getTransactionByOrderIdService = async (orderId: string): Promise<Transaction[]> => {
-  const transactions = await prisma.transactions.findMany({
+  const transactions = await prisma.orderItems.findMany({
     where: {
       orderId
     }
