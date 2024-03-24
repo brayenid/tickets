@@ -1,23 +1,17 @@
 import type { Request, Response } from 'express'
-import { getTicketByIdService, getTicketsByUserIdService } from '../../services/tickets'
-import { AuthError, BadRequestError, NotFoundError } from '../../utils/Errors'
+import { AuthError, BadRequestError } from '../../utils/Errors'
 import { logger } from '../../utils/Logger'
+import { getOrderByIdService, getOrdersByUserIdService } from '../../services/orders'
 
-export const getTicketsByUserId = async (req: Request, res: Response): Promise<Response> => {
+export const getOrdersByUserId = async (req: Request, res: Response): Promise<Response> => {
   const session = req.session.user
-  const { search, limit, page } = req?.query
-  const pageNumber: number = page ? Number(page) : 1
-  const pageLimit: number = limit ? Number(limit) : 12
 
   try {
-    if (!session) {
-      throw new BadRequestError('Invalid session')
-    }
-    const tickets = await getTicketsByUserIdService(session?.id, search as string, pageLimit, pageNumber)
+    const orders = await getOrdersByUserIdService(String(session?.id))
 
     return res.status(200).json({
       status: 'success',
-      data: tickets
+      data: orders
     })
   } catch (error: any) {
     if (error instanceof BadRequestError) {
@@ -27,7 +21,7 @@ export const getTicketsByUserId = async (req: Request, res: Response): Promise<R
       })
     }
 
-    console.log(error)
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: 'Server error'
@@ -35,28 +29,34 @@ export const getTicketsByUserId = async (req: Request, res: Response): Promise<R
   }
 }
 
-export const getTicketsById = async (req: Request, res: Response): Promise<Response> => {
-  const { ticketId } = req.params
+export const getOrderById = async (req: Request, res: Response): Promise<Response> => {
+  const { orderId } = req.params
+
   const session = req.session.user
   try {
-    const ticket = await getTicketByIdService(ticketId)
+    const order = await getOrderByIdService(orderId)
+
+    if (!order.id) {
+      throw new BadRequestError('Invalid order ID')
+    }
     const accessList = ['admin', 'sudo']
 
-    if (session?.id !== ticket.userId && !accessList.includes(String(session?.role))) {
+    if (session?.id !== order.userId && !accessList.includes(String(session?.role))) {
       throw new AuthError('You are not authorized to access this resource')
     }
 
     return res.status(200).json({
       status: 'success',
-      data: ticket
+      data: order
     })
   } catch (error: any) {
-    if (error instanceof NotFoundError) {
+    if (error instanceof BadRequestError) {
       return res.status(400).json({
         status: 'fail',
         message: error.message
       })
     }
+
     if (error instanceof AuthError) {
       return res.status(401).json({
         status: 'fail',

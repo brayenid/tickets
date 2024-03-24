@@ -1,8 +1,9 @@
 import { MidtransError } from 'midtrans-client'
-import type { MidtransPayload, MidtransSnap, MidtransResponse } from '../../interfaces/Midtrans'
+import type { MidtransPayload, MidtransSnap, MidtransResponse, ItemDetails } from '../../interfaces/Midtrans'
 import { prisma } from '../../utils/Db'
 import { midtrans } from '../../utils/Midtrans'
 import type { Transaction } from '../../interfaces/Transaction'
+import { logger } from '../../utils/Logger'
 
 export const addTransactionService = async (payload: MidtransPayload): Promise<MidtransResponse | undefined> => {
   const { id, fee, customer, items } = payload
@@ -51,24 +52,24 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
     }
   }
 
-  try {
-    /* RE-MAP ARRAY OF ITEMS THAT FE SENT, AND WILL BE STORED TO DB */
-    const itemsForDBMapped = items.map((item) => {
-      return {
-        id: item.id,
-        orderId: item.orderId ?? '',
-        amount: item.price,
-        quantity: item.quantity,
-        category: item.category,
-        eventPriceId: item.eventPriceId
-      }
-    })
-
-    let transactionToken: MidtransResponse = {
-      token: '',
-      redirectUrl: ''
+  /* RE-MAP ARRAY OF ITEMS THAT FE SENT, AND WILL BE STORED TO DB */
+  const itemsForDBMapped = items.map((item) => {
+    return {
+      id: item.id,
+      orderId: item.orderId ?? '',
+      amount: item.price,
+      quantity: item.quantity,
+      category: item.category,
+      eventPriceId: item.eventPriceId
     }
+  })
 
+  let transactionToken: MidtransResponse = {
+    token: '',
+    redirectUrl: ''
+  }
+
+  try {
     /* PRISMA TRANSACTION */
     await prisma.$transaction(async (prismaClient) => {
       for (const item of itemsForDBMapped) {
@@ -109,7 +110,57 @@ export const addTransactionService = async (payload: MidtransPayload): Promise<M
 
     return transactionToken
   } catch (error: any) {
-    console.log(error)
+    logger.error(`Add transaction : ${error.message}`)
+
+    if (error instanceof MidtransError) {
+      throw new Error('Server error')
+    }
+
+    throw new Error('Server error')
+  }
+}
+
+export const addOfflineTransactionService = async (items: ItemDetails[]): Promise<void> => {
+  /* RE-MAP ARRAY OF ITEMS THAT FE SENT, AND WILL BE STORED TO DB */
+  const itemsForDBMapped = items.map((item) => {
+    return {
+      id: item.id,
+      orderId: item.orderId ?? '',
+      amount: item.price,
+      quantity: item.quantity,
+      category: item.category,
+      eventPriceId: item.eventPriceId
+    }
+  })
+  try {
+    /* PRISMA TRANSACTION */
+    await prisma.$transaction(async (prismaClient) => {
+      for (const item of itemsForDBMapped) {
+        await prismaClient.orderItems.create({
+          data: {
+            id: item.id,
+            orderId: item.orderId,
+            amount: item.amount,
+            eventPriceId: item.eventPriceId,
+            quantity: item.quantity,
+            category: item.category
+          }
+        })
+
+        await prismaClient.eventPrices.update({
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          },
+          where: {
+            id: item.eventPriceId
+          }
+        })
+      }
+    })
+  } catch (error: any) {
+    logger.error(`Add transaction : ${error.message}`)
 
     if (error instanceof MidtransError) {
       throw new Error('Server error')

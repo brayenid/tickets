@@ -15,6 +15,7 @@ import fs from 'fs/promises'
 import type { FileRequest } from '../../interfaces/Express'
 import path from 'path'
 import { groupByAgeFreq } from '../../utils/helpers/GroupAge'
+import { groupByGenderFreq } from '../../utils/helpers/GroupGender'
 
 export const addEvent = async (req: FileRequest, res: Response): Promise<Response> => {
   const { name, date, description, location, vendor }: EventBasic = req.body
@@ -298,6 +299,37 @@ export const getEventAttendersAge = async (req: Request, res: Response): Promise
     })
 
     const eventAttendersAgeFreq = groupByAgeFreq(attendersAgeMapped)
+
+    return res.status(200).json({
+      status: 'success',
+      data: eventAttendersAgeFreq
+    })
+  } catch (error: any) {
+    if (error instanceof BadRequestError || error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
+    })
+  }
+}
+
+export const getEventAttendersGender = async (req: Request, res: Response): Promise<Response> => {
+  const { eventId } = req.params
+
+  try {
+    const attenders = await getEventAttendersService(eventId)
+    const attendersGenderMapped = attenders.map((attender) => {
+      return {
+        gender: attender.user.gender ?? ''
+      }
+    })
+
+    const eventAttendersAgeFreq = groupByGenderFreq(attendersGenderMapped)
 
     return res.status(200).json({
       status: 'success',

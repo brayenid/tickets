@@ -1,3 +1,5 @@
+import type { ItemDetails } from './Midtrans'
+
 export interface Transaction {
   id: string
   amount: number
@@ -6,4 +8,8 @@ export interface Transaction {
   quantity?: number
   createdAt: Date
   updatedAt: Date
+}
+
+export interface OfflineTransaction {
+  items: ItemDetails[]
 }

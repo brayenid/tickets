@@ -1,5 +1,5 @@
-import type { EventAttenders, EventPayload } from '../../interfaces/Events'
-import { countAge } from '../../utils/CountAge'
+import type { EventAttenders, EventPayload, EventStatus } from '../../interfaces/Events'
+import { countAge } from '../../utils/helpers/CountAge'
 import { Prisma, prisma } from '../../utils/Db'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 
@@ -147,17 +147,23 @@ export const deleteEventService = async (id: string): Promise<string> => {
 }
 
 export const getEventAttendersService = async (eventId: string): Promise<EventAttenders[]> => {
+  // Retrieve a list of attenders for a particular event from the database
   const attenders = await prisma.tickets.findMany({
+    // Select specific fields from the database
     select: {
       id: true,
+      isActive: true,
+      // Select transaction details
       transaction: {
         select: {
           id: true,
           category: true,
+          // Select order details
           order: {
             select: {
               id: true,
               source: true,
+              // Select user details associated with the order
               user: {
                 select: {
                   id: true,
@@ -172,10 +178,11 @@ export const getEventAttendersService = async (eventId: string): Promise<EventAt
         }
       }
     },
+    // Filter the attenders based on the eventId
     where: {
       transaction: {
         order: {
-          eventId
+          eventId // Assuming eventId is a variable containing the ID of the event
         }
       }
     }
@@ -184,13 +191,30 @@ export const getEventAttendersService = async (eventId: string): Promise<EventAt
   const attendersMapped = attenders.map((attender) => {
     return {
       ticketId: attender.id,
+      category: attender.transaction.category,
+      isActive: attender.isActive,
       user: {
         id: attender.transaction.order?.user.id ?? '',
         name: attender.transaction.order?.user.name ?? '`',
-        age: countAge(attender.transaction.order?.user.birth ?? '')
+        age: countAge(attender.transaction.order?.user.birth ?? ''),
+        gender: attender.transaction.order?.user.gender ?? ''
       }
     }
   })
 
   return attendersMapped
+}
+
+export const getEventStatusService = async (eventId: string): Promise<EventStatus> => {
+  const event = await prisma.events.findUniqueOrThrow({
+    select: {
+      isSale: true,
+      isOpen: true
+    },
+    where: {
+      id: eventId
+    }
+  })
+
+  return event
 }

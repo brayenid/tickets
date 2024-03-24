@@ -7,6 +7,18 @@ import { prisma } from './utils/Db'
 import { engine } from 'express-handlebars'
 import { limit } from './utils/RateLimiter'
 
+declare module 'express-session' {
+  interface SessionData {
+    user?: {
+      id: string
+      name: string
+      email?: string
+      role: string
+      username?: string
+    }
+  }
+}
+
 dotenv.config()
 
 const app: Express = express()
@@ -33,19 +45,6 @@ app.use(
   })
 )
 
-declare module 'express-session' {
-  interface SessionData {
-    user?: {
-      id: string
-      name: string
-      email?: string
-      role: string
-      username?: string
-    }
-  }
-}
-
-app.engine('handlebars', engine())
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', './src/views')

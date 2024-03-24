@@ -64,13 +64,13 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
 
       const ticketsArr: TicketPayload[] = []
 
-      // LOOP THROUGH EACH TRANSACTION OBJECT
+      // LOOP THROUGH EACH TRANSACTION/ORDER ITEM OBJECT
       for (let i = 0; i < transactions.length; i++) {
         const { id, quantity } = transactions[i]
 
         // ANOTHER LOOP TO ADD A TICKET FOR 1 QTY
         for (let j = 0; j < (quantity ?? 0); j++) {
-          const ticketId = generateId('TCK')
+          const ticketId = generateId('TX')
 
           ticketsArr.push({
             id: ticketId,
@@ -112,7 +112,7 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
       status: 'success'
     })
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(`Notification webhook : ${error.message}`)
 
     if (error instanceof AuthError) {
       return res.status(403).json({

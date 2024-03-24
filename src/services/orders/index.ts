@@ -1,9 +1,9 @@
-import type { OrderPayload } from '../../interfaces/Order'
+import type { OrderOutput, OrderPayload } from '../../interfaces/Order'
 import { Prisma, prisma } from '../../utils/Db'
 import { PrismaError } from '../../utils/Errors'
 
 export const addOrderService = async (payload: OrderPayload): Promise<void> => {
-  const { id, eventId, userId, source } = payload
+  const { id, eventId, userId, source, status } = payload
 
   try {
     await prisma.$transaction(async (prismaClient) => {
@@ -12,7 +12,8 @@ export const addOrderService = async (payload: OrderPayload): Promise<void> => {
           id,
           eventId: String(eventId),
           userId: String(userId),
-          source: String(source)
+          source: String(source),
+          status: status ?? 'pending'
         }
       })
     })
@@ -26,14 +27,47 @@ export const addOrderService = async (payload: OrderPayload): Promise<void> => {
   }
 }
 
-export const getOrderByIdService = async (id: string): Promise<OrderPayload | null> => {
+export const getOrderByIdService = async (id: string): Promise<OrderOutput> => {
   const order = await prisma.orders.findUnique({
+    select: {
+      id: true,
+      status: true,
+      source: true,
+      userId: true,
+      paymentToken: true,
+      redirectUrl: true,
+      event: {
+        select: {
+          name: true
+        }
+      },
+      OrderItems: {
+        select: {
+          id: true,
+          amount: true,
+          quantity: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      }
+    },
     where: {
       id
     }
   })
 
-  return order
+  const orderMapped = {
+    id: order?.id,
+    status: order?.status,
+    source: order?.source,
+    userId: order?.userId,
+    eventName: order?.event.name,
+    paymentToken: order?.paymentToken,
+    redirectUrl: order?.redirectUrl,
+    items: order?.OrderItems
+  }
+
+  return orderMapped as OrderOutput
 }
 
 export const updateOrderService = async (payload: OrderPayload): Promise<void> => {
@@ -74,4 +108,43 @@ export const deleteOrderService = async (id: string): Promise<void> => {
       id
     }
   })
+}
+
+export const getOrdersByUserIdService = async (userId: string): Promise<OrderOutput[]> => {
+  const orders = await prisma.orders.findMany({
+    select: {
+      id: true,
+      status: true,
+      source: true,
+      event: {
+        select: {
+          name: true
+        }
+      },
+      OrderItems: {
+        select: {
+          id: true,
+          amount: true,
+          quantity: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      }
+    },
+    where: {
+      userId
+    }
+  })
+
+  const ordersMapped = orders.map((order) => {
+    return {
+      id: order.id,
+      status: order.status,
+      source: order.source,
+      eventName: order.event.name,
+      items: order.OrderItems
+    }
+  })
+
+  return ordersMapped
 }

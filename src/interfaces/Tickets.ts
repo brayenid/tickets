@@ -14,6 +14,7 @@ export interface TicketOutput {
   id: string
   transactionId: string
   category: string
+  userId?: string
   isActive: boolean
   createdAt: Date
   updatedAt: Date

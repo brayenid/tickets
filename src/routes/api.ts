@@ -8,6 +8,7 @@ import {
   deleteEvent,
   getEventAttenders,
   getEventAttendersAge,
+  getEventAttendersGender,
   getEventById,
   getEvents,
   updateEvent
@@ -17,9 +18,10 @@ import { addEventPrice, deleteEventPrice, getEventPriceByEventId } from '../cont
 import { addEmailVerification, verifyEmailActivation } from '../controllers/account-email-verification'
 import { addCustomer, updateCustomer } from '../controllers/customer-acc'
 import { limit } from '../utils/RateLimiter'
-import { addTransaction } from '../controllers/transactions'
+import { addOfflineTransaction, addTransaction } from '../controllers/transactions'
 import { processTransactionNotif } from '../controllers/transactions/notification'
-import { getTicketsByUserId } from '../controllers/tickets'
+import { getTicketsById, getTicketsByUserId } from '../controllers/tickets'
+import { getOrderById, getOrdersByUserId } from '../controllers/orders'
 
 const router: Router = Router()
 
@@ -27,6 +29,7 @@ const auth = new Auth('', [])
 const adminAuth = new Auth('admin', ['sudo'])
 const sudoAuth = new Auth('sudo', [])
 const customerAuth = new Auth('customer')
+const customerAuthLoose = new Auth('customer', ['admin', 'sudo'])
 
 /* RATE LIMITER */
 const limitLogin = limit(10)
@@ -65,15 +68,22 @@ router.get('/events/detail/:eventId', getEventById)
 router.put('/events/:eventId', adminAuth.validate, updateEventThumbnailMiddleware, updateEvent)
 router.delete('/events/:eventId', adminAuth.validate, deleteEvent)
 router.get('/events/attenders/:eventId', getEventAttenders)
-router.get('/statistic/events/attenders/:eventId', getEventAttendersAge)
+router.get('/statistic/events/attenders/:eventId/age', getEventAttendersAge)
+router.get('/statistic/events/attenders/:eventId/gender', getEventAttendersGender)
+
+/* ORDERS */
+router.get('/orders/detail', customerAuth.validate, getOrdersByUserId)
+router.get('/orders/detail/:orderId', customerAuthLoose.validate, getOrderById)
 
 /* TRANSACTIONS */
 router.post('/transaction', customerAuth.validate, addTransaction)
+router.post('/transaction/offline', adminAuth.validate, addOfflineTransaction)
 
 /* TRANSACTION NOTIF */
 router.post('/notification/transaction', processTransactionNotif)
 
 /* TICKETS */
-router.get('/tickets', customerAuth.validate, getTicketsByUserId)
+router.get('/tickets/user', customerAuth.validate, getTicketsByUserId)
+router.get('/tickets/detail/:ticketId', customerAuthLoose.validate, getTicketsById)
 
 export default router
