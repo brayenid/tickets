@@ -38,7 +38,8 @@ export const addEmailVerification = async (req: Request, res: Response): Promise
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         status: 'fail',
-        message: error.issues
+        message: 'Bad payload',
+        issues: error.issues
       })
     }
 

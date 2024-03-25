@@ -1,0 +1,19 @@
+{
+    "trailingComma": "none",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100,
+    "useTabs": false,
+    "bracketSpacing": true,
+    "endOfLine": "lf",
+    "arrowParens": "always",
+    "overrides": [   
+      {
+        "files": "**/*.handlebars",
+        "options": {
+          "parser": "angular"   
+        }
+      }
+    ]
+  }

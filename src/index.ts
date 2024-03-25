@@ -1,6 +1,7 @@
 import express, { type Express, type Request, type Response } from 'express'
 import dotenv from 'dotenv'
 import apiRoutes from './routes/api'
+import viewsRoute from './routes/views'
 import session from 'express-session'
 import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 import { prisma } from './utils/Db'
@@ -23,7 +24,7 @@ dotenv.config()
 
 const app: Express = express()
 const port: number | string = process.env.PORT ?? 3000
-const limiter = limit(10)
+const limiter = limit(100)
 
 app.use(limiter)
 app.use(express.static('public'))
@@ -50,10 +51,11 @@ app.set('view engine', 'handlebars')
 app.set('views', './src/views')
 
 app.use('/api', apiRoutes)
+app.use('/', viewsRoute)
 
 app.use((req: Request, res: Response) => {
-  res.render('not-found', {
-    layout: false
+  res.render('errors/not-found', {
+    layout: 'plain'
   })
 })
 

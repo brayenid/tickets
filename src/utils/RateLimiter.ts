@@ -1,5 +1,6 @@
 import rateLimit, { type RateLimitRequestHandler } from 'express-rate-limit'
 import { config } from './Config'
+import type { Request, Response } from 'express'
 
 /**
  * Express rate limiter
@@ -15,6 +16,12 @@ export const limit = (request: number): RateLimitRequestHandler => {
     validate: {
       trustProxy: config.env === 'dev',
       xForwardedForHeader: config.env !== 'dev'
+    },
+    handler: (req: Request, res: Response): Response => {
+      return res.status(429).json({
+        status: 'fail',
+        message: 'Too many request'
+      })
     }
   })
 }

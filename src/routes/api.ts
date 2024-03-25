@@ -1,5 +1,13 @@
 import { Router } from 'express'
-import { addUser, createSudo, deleteUser, getUser, getUsers, resetUserPassword, updateUser } from '../controllers/users'
+import {
+  addUser,
+  createSudo,
+  deleteUser,
+  getUser,
+  getUsers,
+  resetUserPassword,
+  updateUser
+} from '../controllers/users'
 import { addSession, removeSession } from '../controllers/auth'
 import { Auth } from '../middlewares/Auth'
 import { patchPassword } from '../controllers/credentials'
@@ -13,9 +21,19 @@ import {
   getEvents,
   updateEvent
 } from '../controllers/events'
-import { eventThumbnailMiddleware, updateEventThumbnailMiddleware } from '../middlewares/multer/Event'
-import { addEventPrice, deleteEventPrice, getEventPriceByEventId } from '../controllers/event-prices'
-import { addEmailVerification, verifyEmailActivation } from '../controllers/account-email-verification'
+import {
+  eventThumbnailMiddleware,
+  updateEventThumbnailMiddleware
+} from '../middlewares/multer/Event'
+import {
+  addEventPrice,
+  deleteEventPrice,
+  getEventPriceByEventId
+} from '../controllers/event-prices'
+import {
+  addEmailVerification,
+  verifyEmailActivation
+} from '../controllers/account-email-verification'
 import { addCustomer, updateCustomer } from '../controllers/customer-acc'
 import { limit } from '../utils/RateLimiter'
 import { addOfflineTransaction, addTransaction } from '../controllers/transactions'
@@ -33,6 +51,7 @@ const customerAuthLoose = new Auth('customer', ['admin', 'sudo'])
 
 /* RATE LIMITER */
 const limitLogin = limit(10)
+const limitEmailVerification = limit(12)
 
 /* USERS */
 router.post('/users', sudoAuth.validate, addUser)
@@ -53,7 +72,7 @@ router.post('/customers', addCustomer)
 router.patch('/customers', customerAuth.validate, updateCustomer)
 
 /* EMAIL VERIFICATION */
-router.post('/register/verification', addEmailVerification)
+router.post('/register/verification', limitEmailVerification, addEmailVerification)
 router.post('/register/verification/token', verifyEmailActivation)
 
 /* EVENT PRICE */
