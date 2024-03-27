@@ -209,7 +209,6 @@ export const getEventAttendersService = async (eventId: string): Promise<EventAt
 export const getEventStatusService = async (eventId: string): Promise<EventStatus> => {
   const event = await prisma.events.findUniqueOrThrow({
     select: {
-      isSale: true,
       isOpen: true
     },
     where: {

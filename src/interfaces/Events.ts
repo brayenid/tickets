@@ -25,6 +25,5 @@ export interface EventAttenders {
 }
 
 export interface EventStatus {
-  isSale: boolean
   isOpen: boolean
 }

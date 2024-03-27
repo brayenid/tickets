@@ -9,7 +9,7 @@ import {
 import { z } from 'zod'
 
 export const addEventPrice = async (req: Request, res: Response): Promise<Response> => {
-  const { name, price, eventId, stock } = req.body
+  const { name, price, eventId, stock, grade } = req.body
   const id = nanoid(16)
 
   try {
@@ -17,12 +17,13 @@ export const addEventPrice = async (req: Request, res: Response): Promise<Respon
       name: z.string(),
       price: z.number(),
       eventId: z.string(),
-      stock: z.number()
+      stock: z.number(),
+      grade: z.number()
     })
 
-    payloadSchema.parse({ name, price, eventId, stock })
+    payloadSchema.parse({ name, price, eventId, stock, grade })
 
-    await addEventPriceService({ id, name, price, eventId, stock })
+    await addEventPriceService({ id, name, price, eventId, stock, grade })
 
     return res.status(201).json({
       status: 'success',

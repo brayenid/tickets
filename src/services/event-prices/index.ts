@@ -6,7 +6,7 @@ type Operation = 'min' | 'add'
 
 export const addEventPriceService = async (payload: EventPricePayload): Promise<void> => {
   try {
-    const { id, name, eventId, price, stock } = payload
+    const { id, name, eventId, price, stock, grade } = payload
 
     await prisma.eventPrices.create({
       data: {
@@ -14,7 +14,8 @@ export const addEventPriceService = async (payload: EventPricePayload): Promise<
         name,
         price,
         eventId,
-        stock
+        stock,
+        grade
       }
     })
   } catch (error: any) {
@@ -35,7 +36,8 @@ export const getEventPriceByIdService = async (id: string): Promise<EventPricePa
       name: true,
       price: true,
       eventId: true,
-      stock: true
+      stock: true,
+      grade: true
     },
     where: {
       id
@@ -50,17 +52,23 @@ export const getEventPriceByIdService = async (id: string): Promise<EventPricePa
   return eventPrices as EventPricePayload
 }
 
-export const getEventPriceByEventIdService = async (eventId: string): Promise<EventPricePayload[]> => {
+export const getEventPriceByEventIdService = async (
+  eventId: string
+): Promise<EventPricePayload[]> => {
   const eventPrices = await prisma.eventPrices.findMany({
     select: {
       id: true,
       name: true,
       price: true,
       eventId: true,
-      stock: true
+      stock: true,
+      grade: true
     },
     where: {
       eventId
+    },
+    orderBy: {
+      grade: 'desc'
     }
   })
 
@@ -89,7 +97,10 @@ export const deleteEventPriceService = async (id: string): Promise<void> => {
   })
 }
 
-export const operateEventPriceStocKService = async (eventPriceId: string, operation: Operation): Promise<void> => {
+export const operateEventPriceStocKService = async (
+  eventPriceId: string,
+  operation: Operation
+): Promise<void> => {
   if (operation === 'min') {
     await prisma.eventPrices.update({
       data: {

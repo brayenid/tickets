@@ -154,7 +154,7 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
 
   try {
     const getEventStatus = await getEventStatusService(eventId as string)
-    if (!getEventStatus.isSale) {
+    if (!getEventStatus.isOpen) {
       throw new BadRequestError('Event is not on sale')
     }
 

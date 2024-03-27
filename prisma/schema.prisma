@@ -41,7 +41,6 @@ model Events {
   date        String
   description String
   isOpen      Boolean       @default(true)
-  isSale      Boolean       @default(false)
   thumbnail   String        @default("null")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now())
@@ -56,6 +55,7 @@ model EventPrices {
   event      Events       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId    String
   stock      Int
+  grade      Int          @default(0)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @default(now())
   OrderItems OrderItems[]
