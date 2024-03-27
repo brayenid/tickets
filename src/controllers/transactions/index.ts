@@ -7,7 +7,12 @@ import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 import { getEventPriceByIdService } from '../../services/event-prices'
 import { addOfflineTransactionService, addTransactionService } from '../../services/transaction'
 import { generateId } from '../../utils/IDGenerator'
-import { addOrderService, deleteOrderService, getOrderByIdService, updateOrderService } from '../../services/orders'
+import {
+  addOrderService,
+  deleteOrderService,
+  getOrderByIdService,
+  updateOrderService
+} from '../../services/orders'
 import { getEventByIdService, getEventStatusService } from '../../services/events'
 import { addTicketService } from '../../services/tickets'
 import { getUserByIdService } from '../../services/users'
@@ -21,7 +26,7 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
 
   try {
     const getEventStatus = await getEventStatusService(eventId as string)
-    if (!getEventStatus.isSale) {
+    if (!getEventStatus.isOpen) {
       throw new BadRequestError('Event is not on sale')
     }
 
@@ -96,9 +101,14 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
     return res.status(201).json({
       status: 'success',
       message: 'Transaction created',
-      data: transactionToken
+      data: {
+        id,
+        ...transactionToken
+      }
     })
   } catch (error: any) {
+    console.log(error)
+
     /*
     ERROR POSSIBILITY :
     - Invalid Event ID

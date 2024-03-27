@@ -4,20 +4,119 @@
 
 button[type='submit'],
 button[type='button'] {
-  @apply bg-primary-600;
-}
-
-button {
-  @apply w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800;
+  @apply text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800;
 }
 
 input[type='text'],
 input[type='email'],
 input [type='date'],
 .input-styled {
-  @apply bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+  @apply bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500;
 }
 
 .otp-input {
   @apply text-center font-[monospace] !text-lg !p-1;
+}
+
+/* GRIDS */
+#events {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 pb-8;
+}
+
+.event-item {
+  @apply border border-gray-300 bg-gray-50 p-2 md:p-4 rounded-lg hover:border-primary-600;
+}
+
+.event-item img {
+  @apply h-auto max-w-full;
+}
+
+.event-item h3 {
+  @apply font-bold my-2;
+}
+
+.event-item p.desc {
+  @apply mb-6 text-sm md:text-[0.9rem];
+}
+
+.event-item p .vendor {
+  @apply font-bold;
+}
+
+.event-item hr {
+  @apply h-px my-2 bg-gray-200 border-0 dark:bg-gray-700;
+}
+
+.event-item .price-tag {
+  @apply flex items-center gap-2 text-primary-700 justify-end;
+}
+
+.event-item .price-tag p {
+  @apply font-bold text-sm md:text-base;
+}
+
+.primary-badge {
+  @apply w-max bg-primary-100 text-primary-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300;
+}
+
+.red-badge {
+  @apply w-max bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300;
+}
+
+.badge-position {
+  @apply absolute left-2 top-2;
+}
+
+#events .grid-skeleton {
+  @apply max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700;
+}
+
+#events .img-container {
+  @apply relative min-h-28 bg-gray-200 overflow-hidden rounded-lg;
+}
+
+/* EVENT DETAIL */
+#event-detail {
+  @apply max-w-screen-lg mb-5 p-4 md:p-0 w-full mx-auto dark:bg-gray-900 antialiased;
+}
+
+#event-detail .event-stuff {
+  @apply md:flex-[2] flex-col md:flex-row;
+}
+
+.event-stuff .information h1 {
+  @apply text-2xl font-extrabold text-gray-900 dark:text-white md:text-4xl;
+}
+
+.event-stuff .information h1 .vendor {
+  @apply text-transparent bg-clip-text bg-gradient-to-r to-primary-600 from-primary-500;
+}
+
+.event-stuff .information .meta-info {
+  @apply mb-4 mt-2 text-lg;
+}
+
+.event-stuff .event-img-container {
+  @apply rounded-lg overflow-hidden;
+}
+
+.event-stuff .description {
+  @apply text-lg my-4;
+}
+
+#event-detail .qty-counter {
+  @apply bg-gray-50 border-x-0 border-gray-300 h-9 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 !rounded-none;
+}
+
+#event-detail .ticket {
+  @apply border-l-8 border-primary-600 bg-gray-200 rounded-lg overflow-hidden p-2 py-1;
+}
+
+/* Sweet Alert */
+.sw-scaledown {
+  @apply scale-75;
+}
+
+.sw-title {
+  @apply text-2xl font-semibold;
 }

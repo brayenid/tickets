@@ -89,7 +89,7 @@ export const getEventByIdService = async (id: string): Promise<EventPayload> => 
 }
 
 export const updateEventService = async (payload: EventPayload): Promise<void> => {
-  const { id, date, description, location, name, vendor } = payload
+  const { id, date, description, location, name, vendor, thumbnail } = payload
   const currentTime = new Date()
 
   const getEventInfo = await prisma.events.findMany({
@@ -112,7 +112,8 @@ export const updateEventService = async (payload: EventPayload): Promise<void> =
       location,
       name,
       updatedAt: currentTime,
-      vendor
+      vendor,
+      thumbnail
     },
     where: {
       id

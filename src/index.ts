@@ -5,8 +5,10 @@ import viewsRoute from './routes/views'
 import session from 'express-session'
 import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 import { prisma } from './utils/Db'
-import { engine } from 'express-handlebars'
+import { create } from 'express-handlebars'
 import { limit } from './utils/RateLimiter'
+import { loopTimes, formatDate, addCurrencySeparator } from './utils/helpers/HbsHelpers'
+import { authStatus } from './middlewares/AuthStatus'
 
 declare module 'express-session' {
   interface SessionData {
@@ -24,7 +26,7 @@ dotenv.config()
 
 const app: Express = express()
 const port: number | string = process.env.PORT ?? 3000
-const limiter = limit(100)
+const limiter = limit(300)
 
 app.use(limiter)
 app.use(express.static('public'))
@@ -45,8 +47,18 @@ app.use(
     })
   })
 )
+app.use(authStatus)
 
-app.engine('handlebars', engine())
+/* Make a new handlebars obj. */
+const hbs = create({
+  helpers: {
+    loopTimes,
+    formatDate,
+    addCurrencySeparator
+  }
+})
+
+app.engine('handlebars', hbs.engine)
 app.set('view engine', 'handlebars')
 app.set('views', './src/views')
 

@@ -2,6 +2,13 @@
 module.exports = {
   content: ['./node_modules/flowbite/**/*.js', './src/views/**/*.handlebars'],
   theme: {
+    screens: {
+      sm: '480px',
+      md: '768px',
+      mlg: '800px',
+      lg: '976px',
+      xl: '1440px'
+    },
     extend: {
       colors: {
         primary: {

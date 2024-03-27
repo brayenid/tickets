@@ -78,6 +78,150 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
   }
 }
 
+export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
+  const { date, description, location, name, vendor } = req.body
+  const uploadedThumbnail = getUrlPath(req?.file, 8, 9)
+  const { eventId: id } = req.params
+
+  try {
+    const eventSchema = z.object({
+      name: z.string(),
+      date: z.string(),
+      description: z.string(),
+      location: z.string(),
+      vendor: z.string()
+    })
+
+    eventSchema.parse({
+      name,
+      date,
+      description,
+      location,
+      vendor
+    })
+
+    /**
+     * We need to check whether the latest uploaded file has a different
+     * ext. file. If so, we need to remove that current thumbnail with new thumbnail
+     * by unlinking the old one
+     */
+    const { thumbnail: currentThumbnail } = await getEventByIdService(id)
+
+    const isValidPath = (input: string): boolean => {
+      const pattern: RegExp = /^uploads\/events\/[a-zA-Z0-9_-]+\.(png|jpg|jpeg|gif)$/i
+      return pattern.test(input)
+    }
+
+    /**
+     * The point is whether the client upload a new file
+     * if so, execute this
+     */
+    if (req.file && currentThumbnail) {
+      /**
+       * The currentThumbnail value maybe empty or not in the correct format
+       * so this regex will validate the input first whether it's in correct format
+       * if it's correct, execute the next function.
+       */
+      if (isValidPath(currentThumbnail)) {
+        /* Get the latest uploaded file ext. */
+        const currentThumbnailExt = currentThumbnail?.split('/')[2].split('.')[1]
+
+        /* Get the current thumbnail ext. */
+        const uploadedThumbnailExt = req.file?.originalname.split('.')[1]
+
+        if (currentThumbnailExt !== uploadedThumbnailExt) {
+          await fs.unlink(
+            path.resolve(__dirname, '..', '..', '..', 'public', currentThumbnail ?? '')
+          )
+        }
+      }
+    }
+
+    await updateEventService({
+      id,
+      date,
+      description,
+      location,
+      name,
+      vendor,
+      thumbnail: req.file ? uploadedThumbnail : currentThumbnail
+    })
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Event updated successfully'
+    })
+  } catch (error: any) {
+    if (req.file) {
+      await fs.unlink(req.file?.path)
+    }
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Bad payload',
+        issues: error.issues
+      })
+    }
+
+    if (error instanceof PrismaError || error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    console.log(error)
+
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
+    })
+  }
+}
+
+export const deleteEvent = async (req: Request, res: Response): Promise<Response> => {
+  const { eventId } = req.params
+
+  try {
+    const thumbnail = await deleteEventService(eventId)
+    const thumbnailPath = path.resolve(__dirname, '..', '..', '..', 'public', thumbnail)
+
+    await fs.unlink(thumbnailPath)
+    return res.status(200).json({
+      status: 'success',
+      message: 'Event successfully deleted'
+    })
+  } catch (error: any) {
+    if (error instanceof PrismaError || error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    console.log(error.message)
+
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
+    })
+  }
+}
+
 export const getEvents = async (req: Request, res: Response): Promise<Response> => {
   const { search, limit, page } = req?.query
   const pageNumber: number = page ? Number(page) : 1
@@ -139,104 +283,6 @@ export const getEventById = async (req: Request, res: Response): Promise<Respons
     }
 
     if (error instanceof PrismaError) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message
-      })
-    }
-
-    if (error instanceof NotFoundError) {
-      return res.status(404).json({
-        status: 'fail',
-        message: error.message
-      })
-    }
-
-    console.log(error.message)
-
-    return res.status(500).json({
-      status: 'fail',
-      message: error.message
-    })
-  }
-}
-
-export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
-  const { date, description, location, name, vendor } = req.body
-  const { eventId: id } = req.params
-
-  try {
-    const eventSchema = z.object({
-      name: z.string(),
-      date: z.string(),
-      description: z.string(),
-      location: z.string(),
-      vendor: z.string()
-    })
-
-    eventSchema.parse({
-      name,
-      date,
-      description,
-      location,
-      vendor
-    })
-
-    await updateEventService({ id, date, description, location, name, vendor })
-
-    return res.status(200).json({
-      status: 'success',
-      message: 'Event updated successfully'
-    })
-  } catch (error: any) {
-    if (req.file) {
-      await fs.unlink(req.file?.path)
-    }
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'Bad payload',
-        issues: error.issues
-      })
-    }
-
-    if (error instanceof PrismaError || error instanceof BadRequestError) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message
-      })
-    }
-
-    if (error instanceof NotFoundError) {
-      return res.status(404).json({
-        status: 'fail',
-        message: error.message
-      })
-    }
-
-    console.log(error.message)
-
-    return res.status(500).json({
-      status: 'fail',
-      message: error.message
-    })
-  }
-}
-
-export const deleteEvent = async (req: Request, res: Response): Promise<Response> => {
-  const { eventId } = req.params
-
-  try {
-    const thumbnail = await deleteEventService(eventId)
-    const thumbnailPath = path.resolve(__dirname, '..', '..', '..', 'public', thumbnail)
-
-    await fs.unlink(thumbnailPath)
-    return res.status(200).json({
-      status: 'success',
-      message: 'Event successfully deleted'
-    })
-  } catch (error: any) {
-    if (error instanceof PrismaError || error instanceof BadRequestError) {
       return res.status(400).json({
         status: 'fail',
         message: error.message

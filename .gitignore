@@ -3,7 +3,7 @@ node_modules
 .env
 prisma/migrations
 *.db
-public
+public/uploads
 bu
 error.log
 dist
