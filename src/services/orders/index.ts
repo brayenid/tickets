@@ -38,7 +38,8 @@ export const getOrderByIdService = async (id: string): Promise<OrderOutput> => {
       redirectUrl: true,
       event: {
         select: {
-          name: true
+          name: true,
+          thumbnail: true
         }
       },
       OrderItems: {
@@ -62,6 +63,7 @@ export const getOrderByIdService = async (id: string): Promise<OrderOutput> => {
     source: order?.source,
     userId: order?.userId,
     eventName: order?.event.name,
+    eventThumbnail: order?.event.thumbnail,
     paymentToken: order?.paymentToken,
     redirectUrl: order?.redirectUrl,
     items: order?.OrderItems
@@ -116,9 +118,11 @@ export const getOrdersByUserIdService = async (userId: string): Promise<OrderOut
       id: true,
       status: true,
       source: true,
+      updatedAt: true,
       event: {
         select: {
-          name: true
+          name: true,
+          thumbnail: true
         }
       },
       OrderItems: {
@@ -133,6 +137,9 @@ export const getOrdersByUserIdService = async (userId: string): Promise<OrderOut
     },
     where: {
       userId
+    },
+    orderBy: {
+      updatedAt: 'desc'
     }
   })
 
@@ -142,7 +149,9 @@ export const getOrdersByUserIdService = async (userId: string): Promise<OrderOut
       status: order.status,
       source: order.source,
       eventName: order.event.name,
-      items: order.OrderItems
+      eventThumbnail: order.event.thumbnail,
+      items: order.OrderItems,
+      updatedAt: order.updatedAt
     }
   })
 

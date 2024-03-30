@@ -1,0 +1,104 @@
+<main id="ticket-detail" class="container" data-tx-id="{{ ticket.id }}">
+  {{> breadcrumbs }}
+  <h2 class="styled-h2 !my-5 !text-center">Ticket Detail</h2>
+  <div class="item">
+    <div class="qr-container">
+      <div id="qrcode"></div>
+      <div
+        class="flex items-center p-4 mt-2 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+        role="alert"
+      >
+        <svg
+          class="flex-shrink-0 inline w-4 h-4 me-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+          />
+        </svg>
+        <span class="sr-only">Info</span>
+        <div>Scan before enter the gate</div>
+      </div>
+    </div>
+    <div class="detail flex-[2.4] rounded-lg space-y-4 overflow-x-auto">
+      <table
+        class="w-full text-xs sm:text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 overflow-hidden shadow-sm rounded-lg"
+      >
+        <tbody>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Ticket ID
+            </th>
+            <td class="px-6 py-4">: {{ ticket.id }}</td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Order ID
+            </th>
+            <td class="px-6 py-4">
+              : <a class="styled" href="/user/orders/{{ ticket.orderId }}">{{ ticket.orderId }}</a>
+            </td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Active
+            </th>
+            <td class="px-6 py-4">: {{ ticket.isActive }}</td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:bg-gray-800">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Category
+            </th>
+            <td class="px-6 py-4">: {{ ticket.category }}</td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Event Name
+            </th>
+            <td class="px-6 py-4">
+              : <a class="styled" href="/events/{{ ticket.event.id }}">{{ ticket.event.name }}</a>
+            </td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Event Date
+            </th>
+            <td class="px-6 py-4">: {{formatDate ticket.event.date }}</td>
+          </tr>
+          <tr class="bg-white dark:bg-gray-800">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Event Location
+            </th>
+            <td class="px-6 py-4">: {{ ticket.event.location }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<script src="/script/packages/qrcode.min.js"></script>
+<script src="/script/tickets/ticket-detail.js"></script>

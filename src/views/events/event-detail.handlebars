@@ -8,7 +8,7 @@
           <span class="vendor">{{ event.vendor }}</span>
         </h1>
         <div class="meta-info">
-          <p>{{ event.location }} - {{formatDate event.date }}</p>
+          <p class="mb-2">{{ event.location }} - {{formatDate event.date }}</p>
           <div class="{{#if event.isOpen}}primary-badge{{else}}red-badge{{/if}}">
             {{#if event.isOpen}}
             Sale
@@ -19,8 +19,9 @@
         </div>
       </div>
       <div class="event-img-container">
-        <img src="/{{ event.thumbnail }}" alt="{{ event.name }}" />
+        <img src="/{{ event.thumbnail }}" alt="{{ event.name }}" title="{{ event.name }}" />
       </div>
+
       <h2
         class="text-xl text-center md:text-left font-extrabold leading-none my-4 tracking-tight text-gray-900 dark:text-white"
       >
@@ -31,62 +32,12 @@
         </span>
       </h2>
       <p class="description">{{ event.description }}</p>
+      {{> share }}
     </div>
     <div class="book-stuff md:flex-[1]">
-      <div class="sticky top-20">
-        <h2
-          class="text-xl mb-2 text-center md:text-left font-extrabold leading-none tracking-tight text-gray-900 dark:text-white"
-        >
-          <span
-            class="underline underline-offset-2 decoration-4 decoration-primary-400 dark:decoration-primary-600"
-            >Tickets :
-          </span>
-        </h2>
-        <p class="mb-4">Set the ticket quantity</p>
-        <div class="space-y-4">
-          {{#if eventPrices.length}}
-          {{#each eventPrices}}
-          <div class="ticket" data-price-id="{{ id }}">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="font-bold text-md">{{ name }}</h3>
-                <p>Rp. {{addCurrencySeparator price }}</p>
-              </div>
-              <aside>
-                {{!-- counter --}}
-                {{> qty-counter }}
-              </aside>
-            </div>
-          </div>
-          {{/each}}
-          <button class="w-full" type="button" onclick="checkout()">Checkout</button>
-          {{else}}
-          <p
-            class="w-full p-2 border text-center flex gap-2 justify-center items-center rounded-lg"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5 text-gray-400"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                fill-rule="evenodd"
-                d="m14.014 17l-.006 2.003c-.001.47-.002.705-.149.851c-.147.146-.382.146-.854.146h-3.01c-3.78 0-5.67 0-6.845-1.172c-.81-.806-1.061-1.951-1.14-3.817c-.015-.37-.023-.556.046-.679c.07-.123.345-.277.897-.586a1.999 1.999 0 0 0 0-3.492c-.552-.308-.828-.463-.897-.586c-.069-.123-.061-.308-.045-.679c.078-1.866.33-3.01 1.139-3.817C4.324 4 6.214 4 9.995 4h3.51a.5.5 0 0 1 .501.499L14.014 7c0 .552.449 1 1.002 1v2c-.553 0-1.002.448-1.002 1v2c0 .552.449 1 1.002 1v2c-.553 0-1.002.448-1.002 1"
-                clip-rule="evenodd"
-              />
-              <path
-                fill="currentColor"
-                d="M15.017 16c.553 0 1.002.448 1.002 1v1.976c0 .482 0 .723.155.87c.154.148.39.138.863.118c1.863-.079 3.007-.331 3.814-1.136c.809-.806 1.06-1.952 1.139-3.818c.015-.37.023-.555-.046-.678c-.069-.124-.345-.278-.897-.586a1.999 1.999 0 0 1 0-3.492c.552-.309.828-.463.897-.586c.07-.124.061-.309.046-.679c-.079-1.866-.33-3.011-1.14-3.818c-.877-.875-2.154-1.096-4.322-1.152a.497.497 0 0 0-.509.497V7c0 .552-.449 1-1.002 1v2a1 1 0 0 1 1.002 1v2c0 .552-.449 1-1.002 1z"
-                opacity=".5"
-              />
-            </svg>
-            No ticket found!
-          </p>
-          {{/if}}
-        </div>
-      </div>
+      {{>tickets}}
     </div>
   </div>
 </main>
-<script src="/script/events/event-detail.js"></script>
+{{> floating-sidebar }}
+<script src="/script/events/event-detail.js" defer></script>

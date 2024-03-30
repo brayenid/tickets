@@ -1,5 +1,6 @@
 export const config = {
   env: process.env.NODE_ENV?.trimEnd(),
+  host: process.env.HOST,
   transaction: {
     fee: 5000
   },

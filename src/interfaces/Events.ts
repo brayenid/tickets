@@ -1,10 +1,12 @@
 export interface EventBasic {
   name: string
-  vendor: string
+  vendor?: string
+  vendorId?: string
   location: string
   date: string
   description: string
   thumbnail?: string
+  lowestPrice?: number
 }
 
 export interface EventPayload extends EventBasic {

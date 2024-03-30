@@ -47,13 +47,17 @@ export const getTicketsByUserIdService = async (
                 select: {
                   id: true,
                   name: true,
-                  date: true
+                  date: true,
+                  thumbnail: true
                 }
               }
             }
           }
         }
       }
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   })
 
@@ -67,7 +71,8 @@ export const getTicketsByUserIdService = async (
     event: {
       id: ticket.transaction.order?.event.id ?? '',
       name: ticket.transaction.order?.event.name ?? '',
-      date: ticket.transaction.order?.event.date ?? ''
+      date: ticket.transaction.order?.event.date ?? '',
+      thumbnail: ticket.transaction.order?.event.thumbnail ?? ''
     }
   }))
   return formattedTickets
@@ -83,12 +88,15 @@ export const getTicketByIdService = async (ticketId: string): Promise<TicketOutp
             category: true,
             order: {
               select: {
+                id: true,
                 userId: true,
                 event: {
                   select: {
                     id: true,
                     name: true,
-                    date: true
+                    date: true,
+                    thumbnail: true,
+                    location: true
                   }
                 }
               }
@@ -101,6 +109,7 @@ export const getTicketByIdService = async (ticketId: string): Promise<TicketOutp
     const formattedTickets: TicketOutput = {
       id: ticket?.id ?? '',
       transactionId: ticket?.transactionId,
+      orderId: ticket.transaction.order?.id,
       category: ticket?.transaction.category,
       isActive: ticket?.isActive,
       userId: ticket?.transaction.order?.userId,
@@ -109,7 +118,9 @@ export const getTicketByIdService = async (ticketId: string): Promise<TicketOutp
       event: {
         id: ticket?.transaction.order?.event.id ?? '',
         name: ticket?.transaction.order?.event.name ?? '',
-        date: ticket?.transaction.order?.event.date ?? ''
+        date: ticket?.transaction.order?.event.date ?? '',
+        thumbnail: ticket.transaction.order?.event.thumbnail ?? '',
+        location: ticket.transaction.order?.event.location ?? ''
       }
     }
     return formattedTickets

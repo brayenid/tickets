@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import { AuthError, BadRequestError, PrismaError } from '../../utils/Errors'
 import { patchPasswordService } from '../../services/credentials'
+
 export const patchPassword = async (req: Request, res: Response): Promise<Response> => {
   const { oldPassword, newPassword } = req.body
   const session = req.session.user
@@ -13,7 +14,13 @@ export const patchPassword = async (req: Request, res: Response): Promise<Respon
       message: 'Password updated successfully'
     })
   } catch (error: any) {
-    if (error instanceof AuthError || error instanceof PrismaError || error instanceof BadRequestError) {
+    console.log(error)
+
+    if (
+      error instanceof AuthError ||
+      error instanceof PrismaError ||
+      error instanceof BadRequestError
+    ) {
       return res.status(400).json({
         status: 'fail',
         message: error.message

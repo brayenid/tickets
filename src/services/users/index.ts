@@ -30,7 +30,10 @@ export const addUserService = async (payload: User): Promise<void> => {
   }
 }
 
-export const updateUserService = async (id: string | undefined, payload: UserUpdate): Promise<void> => {
+export const updateUserService = async (
+  id: string | undefined,
+  payload: UserUpdate
+): Promise<void> => {
   const { name, address, birth } = payload
   const currentTime = new Date()
 
@@ -179,4 +182,25 @@ export const resetUserPasswordService = async (id: string, password: string): Pr
       id
     }
   })
+}
+
+export const getVendorByUserIdService = async (id: string): Promise<Users> => {
+  const user = await prisma.users.findUnique({
+    select: {
+      id: true,
+      name: true,
+      role: true,
+      email: true
+    },
+    where: {
+      id,
+      role: 'vendor'
+    }
+  })
+
+  if (!user) {
+    throw new NotFoundError('Vendor does not exist')
+  }
+
+  return user
 }

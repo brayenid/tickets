@@ -1,5 +1,9 @@
+{{!-- Compatible in home --}}
 <div id="events">
   {{#loopTimes 8}}
   {{> grid-skeleton }}
   {{/loopTimes}}
+</div>
+<div class="w-full flex justify-center py-4 items-center">
+  <button type="button" onclick="loadMore()" id="event-loader">Load More</button>
 </div>

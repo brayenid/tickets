@@ -13,6 +13,7 @@ export interface TicketPayload {
 export interface TicketOutput {
   id: string
   transactionId: string
+  orderId?: string
   category: string
   userId?: string
   isActive: boolean
@@ -22,5 +23,7 @@ export interface TicketOutput {
     id: string
     name: string
     date: string
+    thumbnail: string
+    location?: string
   }
 }

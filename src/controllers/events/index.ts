@@ -16,9 +16,10 @@ import type { FileRequest } from '../../interfaces/Express'
 import path from 'path'
 import { groupByAgeFreq } from '../../utils/helpers/GroupAge'
 import { groupByGenderFreq } from '../../utils/helpers/GroupGender'
+import { getVendorByUserIdService } from '../../services/users'
 
 export const addEvent = async (req: FileRequest, res: Response): Promise<Response> => {
-  const { name, date, description, location, vendor }: EventBasic = req.body
+  const { name, date, description, location, vendorId }: EventBasic = req.body
   const thumbnail = getUrlPath(req.file, 8, 9)
 
   const id: string = req.fileId ?? ''
@@ -35,7 +36,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
       date: z.string(),
       description: z.string(),
       location: z.string(),
-      vendor: z.string()
+      vendorId: z.string()
     })
 
     eventSchema.parse({
@@ -43,10 +44,20 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
       date,
       description,
       location,
-      vendor
+      vendorId
     })
 
-    await addEventService({ name, date, description, location, id, thumbnail, vendor })
+    await getVendorByUserIdService(String(vendorId))
+
+    await addEventService({
+      name,
+      date,
+      description,
+      location,
+      id,
+      thumbnail,
+      vendorId
+    })
 
     return res.status(200).json({
       status: 'success',
@@ -64,7 +75,11 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
       })
     }
 
-    if (error instanceof PrismaError || error instanceof BadRequestError) {
+    if (
+      error instanceof PrismaError ||
+      error instanceof BadRequestError ||
+      error instanceof NotFoundError
+    ) {
       return res.status(400).json({
         status: 'fail',
         message: error.message
@@ -79,7 +94,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
 }
 
 export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
-  const { date, description, location, name, vendor } = req.body
+  const { date, description, location, name, vendorId } = req.body
   const uploadedThumbnail = getUrlPath(req?.file, 8, 9)
   const { eventId: id } = req.params
 
@@ -89,7 +104,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       date: z.string(),
       description: z.string(),
       location: z.string(),
-      vendor: z.string()
+      vendorId: z.string()
     })
 
     eventSchema.parse({
@@ -97,7 +112,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       date,
       description,
       location,
-      vendor
+      vendorId
     })
 
     /**
@@ -143,7 +158,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       description,
       location,
       name,
-      vendor,
+      vendorId,
       thumbnail: req.file ? uploadedThumbnail : currentThumbnail
     })
 

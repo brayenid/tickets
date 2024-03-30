@@ -14,16 +14,18 @@ model Users {
   id        String   @id
   name      String
   email     String   @unique
+  phone     String   @default("0")
   password  String
   address   String   @default("0")
   role      String   @default("admin")
   birth     String   @default("1970-01-01")
   avatar    String   @default("null")
   isActive  Boolean  @default(false)
-  gender    String   @default("unknown")
+  gender    String   @default("Unknown")
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
   Orders    Orders[]
+  Events    Events[]
 }
 
 model Session {
@@ -36,7 +38,8 @@ model Session {
 model Events {
   id          String        @id
   name        String
-  vendor      String        @default("Kita Tiket")
+  Vendor      Users         @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId    String
   location    String
   date        String
   description String

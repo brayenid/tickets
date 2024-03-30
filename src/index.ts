@@ -7,7 +7,7 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 import { prisma } from './utils/Db'
 import { create } from 'express-handlebars'
 import { limit } from './utils/RateLimiter'
-import { loopTimes, formatDate, addCurrencySeparator } from './utils/helpers/HbsHelpers'
+import { loopTimes, formatDate, addCurrencySeparator, isEqual } from './utils/helpers/HbsHelpers'
 import { authStatus } from './middlewares/AuthStatus'
 
 declare module 'express-session' {
@@ -54,7 +54,8 @@ const hbs = create({
   helpers: {
     loopTimes,
     formatDate,
-    addCurrencySeparator
+    addCurrencySeparator,
+    isEqual
   }
 })
 

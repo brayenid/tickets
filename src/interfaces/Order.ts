@@ -21,8 +21,10 @@ export interface OrderOutput {
   source: string
   status: string
   eventName: string
+  eventThumbnail?: string
   userId?: string
   paymentToken?: string
   redirectUrl?: string
+  updatedAt?: Date
   items: OrderOutputItems[]
 }

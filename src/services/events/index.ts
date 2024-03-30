@@ -4,7 +4,7 @@ import { Prisma, prisma } from '../../utils/Db'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
 
 export const addEventService = async (payload: EventPayload): Promise<void> => {
-  const { id, date, description, location, name, thumbnail, vendor } = payload
+  const { id, date, description, location, name, thumbnail, vendorId } = payload
 
   try {
     await prisma.events.create({
@@ -15,7 +15,7 @@ export const addEventService = async (payload: EventPayload): Promise<void> => {
         location,
         name,
         thumbnail,
-        vendor
+        vendorId: vendorId ?? ''
       }
     })
   } catch (error: any) {
@@ -45,7 +45,20 @@ export const getEventsService = async (
       date: true,
       description: true,
       thumbnail: true,
-      vendor: true
+      Vendor: {
+        select: {
+          name: true
+        }
+      },
+      EventPrices: {
+        select: {
+          price: true
+        },
+        orderBy: {
+          grade: 'asc'
+        },
+        take: 1
+      }
     },
     where: {
       OR: [
@@ -60,36 +73,76 @@ export const getEventsService = async (
           }
         },
         {
-          vendor: {
-            contains: search
+          Vendor: {
+            name: {
+              contains: search
+            }
           }
         }
       ]
     },
     orderBy: [
       {
-        updatedAt: 'desc'
+        createdAt: 'desc'
       }
     ],
     skip: offset,
     take: limit
   })
 
-  return events
+  const eventsMapped = events.map((event) => {
+    return {
+      id: event.id,
+      isOpen: event.isOpen,
+      name: event.name,
+      location: event.location,
+      date: event.date,
+      description: event.description,
+      thumbnail: event.thumbnail,
+      vendor: event.Vendor.name,
+      lowestPrice: event.EventPrices[0]?.price ?? 0
+    }
+  })
+
+  return eventsMapped
 }
 
 export const getEventByIdService = async (id: string): Promise<EventPayload> => {
-  const event = (await prisma.events.findUnique({
+  const event = await prisma.events.findUnique({
+    select: {
+      id: true,
+      isOpen: true,
+      name: true,
+      location: true,
+      date: true,
+      description: true,
+      thumbnail: true,
+      Vendor: {
+        select: {
+          name: true
+        }
+      }
+    },
     where: {
       id
     }
-  })) as EventPayload
+  })
+  const eventMapped = {
+    id: event?.id ?? '',
+    isOpen: event?.isOpen ?? true,
+    name: event?.name ?? '',
+    location: event?.location ?? '',
+    date: event?.date ?? '',
+    description: event?.description ?? '',
+    thumbnail: event?.thumbnail ?? '',
+    vendor: event?.Vendor.name ?? ''
+  }
 
-  return event
+  return eventMapped
 }
 
 export const updateEventService = async (payload: EventPayload): Promise<void> => {
-  const { id, date, description, location, name, vendor, thumbnail } = payload
+  const { id, date, description, location, name, vendorId, thumbnail } = payload
   const currentTime = new Date()
 
   const getEventInfo = await prisma.events.findMany({
@@ -112,7 +165,7 @@ export const updateEventService = async (payload: EventPayload): Promise<void> =
       location,
       name,
       updatedAt: currentTime,
-      vendor,
+      vendorId,
       thumbnail
     },
     where: {

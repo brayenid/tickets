@@ -1,0 +1,90 @@
+<main id="order-detail" class="container" data-token="{{ order.paymentToken }}">
+  {{> breadcrumbs }}
+  <h2 class="styled-h2 !my-5 !text-center">Order Detail</h2>
+  <div class="flex gap-4 items-start">
+    <div class="detail flex-[2.4] rounded-lg space-y-4 overflow-x-auto">
+      <table
+        class="w-full text-xs sm:text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 overflow-hidden shadow-sm rounded-lg"
+      >
+        <tbody>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Order ID
+            </th>
+            <td class="px-6 py-4">: {{ order.id }}</td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Event Name
+            </th>
+            <td class="px-6 py-4">: {{ order.eventName }}</td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Status
+            </th>
+            <td class="px-6 py-4">: {{ order.status }}</td>
+          </tr>
+          <tr class="bg-white dark:bg-gray-800">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Source
+            </th>
+            <td class="px-6 py-4">: {{ order.source }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        class="w-full bg-white text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 overflow-hidden shadow-sm rounded-lg"
+      >
+        <table
+          class="w-full text-xs sm:text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 overflow-hidden shadow-sm rounded-lg"
+        >
+          <thead
+            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+          >
+            <tr>
+              <th scope="col" class="px-6 py-3">Transaction ID</th>
+              <th scope="col" class="px-6 py-3">Quantity</th>
+              <th scope="col" class="px-6 py-3">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each order.items}}
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <td scope="row" class="px-6 py-4">
+                {{ id }}
+              </td>
+              <td class="px-6 py-4">{{ quantity }}</td>
+              <td class="px-6 py-4">{{addCurrencySeparator amount }}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{#unless isOrderSettled}}
+  <div class="my-4 flex justify-end">
+    <button type="button" onclick="openPayment()" class="w-full md:w-max">Pay</button>
+  </div>
+  {{/unless}}
+  <div id="snap-container"></div>
+</main>
+<script
+  type="text/javascript"
+  src="https://app.sandbox.midtrans.com/snap/snap.js"
+  data-client-key="SB-Mid-client-sPkfGmCmo0Gk4_kQ"
+></script>
+<script src="/script/orders/order-detail.js"></script>

@@ -40,3 +40,13 @@ export const addCurrencySeparator = (number: number): string => {
 
   return formattedNumber
 }
+
+export const isEqual = (role: string, permittedRole: string, block: any): any => {
+  const permittedRoleArr = permittedRole.split(',')
+
+  if (permittedRoleArr.includes(role)) {
+    return block.fn(this)
+  } else {
+    return block.inverse(this)
+  }
+}
