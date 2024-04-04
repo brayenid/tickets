@@ -2,9 +2,10 @@ import type { User, Users, UserUpdate } from '../../interfaces/Users'
 import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 
 import { prisma, Prisma } from '../../utils/Db'
+import { redis } from '../../utils/Redis'
 
 export const addUserService = async (payload: User): Promise<void> => {
-  const { id, name, password, email, role, isActive, address, birth, gender } = payload
+  const { id, name, password, email, role, isActive, address, birth, gender, phone } = payload
 
   try {
     await prisma.users.create({
@@ -17,7 +18,8 @@ export const addUserService = async (payload: User): Promise<void> => {
         isActive,
         address,
         birth,
-        gender
+        gender,
+        phone
       }
     })
   } catch (error: any) {
@@ -75,37 +77,6 @@ export const deleteUserService = async (id: string): Promise<void> => {
     }
 
     throw new Error(error.message as string)
-  }
-}
-
-export const getUsersService = async (search: string = '', limit: number): Promise<Users[]> => {
-  try {
-    const users = await prisma.users.findMany({
-      select: {
-        id: true,
-        name: true,
-        role: true,
-        email: true
-      },
-      where: {
-        AND: [
-          {
-            name: {
-              contains: search
-            }
-          }
-        ]
-      },
-      take: limit
-    })
-
-    return users
-  } catch (error: any) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      throw new PrismaError(error.message)
-    } else {
-      throw new PrismaError('Server error')
-    }
   }
 }
 
@@ -184,8 +155,38 @@ export const resetUserPasswordService = async (id: string, password: string): Pr
   })
 }
 
-export const getVendorByUserIdService = async (id: string): Promise<Users> => {
+export const getUserCompleteService = async (id: string, role: string): Promise<Users> => {
   const user = await prisma.users.findUnique({
+    select: {
+      id: true,
+      name: true,
+      role: true,
+      email: true,
+      birth: true,
+      address: true,
+      phone: true
+    },
+    where: {
+      id,
+      role
+    }
+  })
+
+  if (!user) {
+    throw new NotFoundError('User does not exist')
+  }
+
+  return user
+}
+
+export const getUsersByRoleService = async (
+  search: string = '',
+  role: string,
+  limit: number = 9,
+  pageNumber: number = 1
+): Promise<Users[]> => {
+  const offset = (pageNumber - 1) * limit
+  const vendors = await prisma.users.findMany({
     select: {
       id: true,
       name: true,
@@ -193,14 +194,68 @@ export const getVendorByUserIdService = async (id: string): Promise<Users> => {
       email: true
     },
     where: {
-      id,
-      role: 'vendor'
+      AND: [
+        {
+          role
+        },
+        {
+          name: {
+            contains: search
+          }
+        }
+      ]
+    },
+    skip: offset,
+    take: limit,
+    orderBy: {
+      createdAt: 'desc'
     }
   })
 
-  if (!user) {
-    throw new NotFoundError('Vendor does not exist')
+  return vendors
+}
+
+export const getUsersByRoleTotalService = async (
+  search: string = '',
+  role: string,
+  page: number = 0,
+  limit: number = 0
+): Promise<number> => {
+  let vendorsTotal: number = 0
+
+  if (page || limit || search) {
+    const vendorsTotalFromDb = await prisma.users.aggregate({
+      _count: {
+        id: true
+      },
+      where: {
+        name: {
+          contains: search
+        },
+        role
+      }
+    })
+
+    vendorsTotal = vendorsTotalFromDb._count.id
+  } else {
+    const eventsFromCache = await redis.get(`${role}s:total`)
+
+    if (eventsFromCache) {
+      vendorsTotal = Number(eventsFromCache)
+    } else {
+      const vendorsTotalFromDb = await prisma.users.aggregate({
+        _count: {
+          id: true
+        },
+        where: {
+          role
+        }
+      })
+
+      vendorsTotal = vendorsTotalFromDb._count.id
+      await redis.setex(`${role}s:total`, 900, vendorsTotal)
+    }
   }
 
-  return user
+  return vendorsTotal
 }

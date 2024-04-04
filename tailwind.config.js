@@ -28,5 +28,10 @@ module.exports = {
       }
     }
   },
-  plugins: [require('flowbite/plugin')]
+  plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('flowbite/plugin')({
+      charts: true
+    })
+  ]
 }

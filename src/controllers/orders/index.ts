@@ -1,7 +1,15 @@
 import type { Request, Response } from 'express'
-import { AuthError, BadRequestError } from '../../utils/Errors'
+import { AuthError, BadRequestError, PrismaError } from '../../utils/Errors'
 import { logger } from '../../utils/Logger'
-import { getOrderByIdService, getOrdersByUserIdService } from '../../services/orders'
+import {
+  getOrderByIdService,
+  getOrdersByDayService,
+  getOrdersByEventIdService,
+  getOrdersByUserIdService
+} from '../../services/orders'
+import { groupByOrdersSource } from '../../utils/helpers/GroupOrdersSource'
+import { groupByDay } from '../../utils/helpers/GroupByTime'
+import { getTransactionsAmountTotalService } from '../../services/transaction'
 
 export const getOrdersByUserId = async (req: Request, res: Response): Promise<Response> => {
   const session = req.session.user
@@ -68,6 +76,72 @@ export const getOrderById = async (req: Request, res: Response): Promise<Respons
     return res.status(500).json({
       status: 'fail',
       message: 'Server error'
+    })
+  }
+}
+
+export const getOrdersByEventIdSource = async (req: Request, res: Response): Promise<Response> => {
+  const { eventId } = req.params
+
+  try {
+    const orders = await getOrdersByEventIdService(eventId)
+
+    const ordersBySourceMapped = orders.map((order) => {
+      return {
+        source: order.source ?? ''
+      }
+    })
+
+    const ordersBySource = groupByOrdersSource(ordersBySourceMapped)
+
+    return res.status(200).json({
+      status: 'success',
+      data: ordersBySource
+    })
+  } catch (error: any) {
+    if (error instanceof BadRequestError || error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
+    })
+  }
+}
+
+export const getOrdersByDay = async (req: Request, res: Response): Promise<Response> => {
+  const { eventId } = req.params
+
+  try {
+    const orders = await getOrdersByDayService(eventId)
+    const transactionsAmount = await getTransactionsAmountTotalService(eventId)
+    const ordersByDayMapped = groupByDay(orders)
+
+    const orderTotal = ordersByDayMapped.reduce((a, b) => {
+      return a + b.freq
+    }, 0)
+
+    return res.status(200).json({
+      status: 'success',
+      data: ordersByDayMapped,
+      meta: {
+        total: orderTotal,
+        amount: transactionsAmount
+      }
+    })
+  } catch (error: any) {
+    if (error instanceof BadRequestError || error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
     })
   }
 }

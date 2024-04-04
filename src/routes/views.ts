@@ -6,7 +6,16 @@ import { orderDetail, orders } from '../controllers/views/orders'
 import { Auth } from '../middlewares/Auth'
 import { ticketDetail, tickets } from '../controllers/views/tickets'
 import { patchPassword } from '../controllers/views/credentials'
-import { main } from '../controllers/views/dashboard'
+import {
+  createCustomer,
+  createEvent,
+  createVendors,
+  customerDetailDashboard,
+  eventDetailDashboard,
+  eventSummaryDashboard,
+  main,
+  vendorDetailDashboard
+} from '../controllers/views/dashboard'
 
 const router: Router = Router()
 const customerAuth = new Auth('customer', [], 'view')
@@ -29,5 +38,12 @@ router.get('/user/credential', customerAuthLoose.validate, patchPassword)
 
 /* DASHBOARD */
 router.get('/dashboard', adminAuth.validate, main)
+router.get('/dashboard/events', adminAuth.validate, createEvent)
+router.get('/dashboard/events/:eventId', adminAuth.validate, eventSummaryDashboard)
+router.get('/dashboard/events/:eventId/detail', adminAuth.validate, eventDetailDashboard)
+router.get('/dashboard/vendors', adminAuth.validate, createVendors)
+router.get('/dashboard/vendors/:userId', adminAuth.validate, vendorDetailDashboard)
+router.get('/dashboard/customers', adminAuth.validate, createCustomer)
+router.get('/dashboard/customers/:userId', adminAuth.validate, customerDetailDashboard)
 
 export default router

@@ -1,4 +1,4 @@
-import type { TicketOutput, TicketPayload } from '../../interfaces/Tickets'
+import type { TicketOutput, TicketOutputSimple, TicketPayload } from '../../interfaces/Tickets'
 import { prisma } from '../../utils/Db'
 import { NotFoundError } from '../../utils/Errors'
 
@@ -127,4 +127,35 @@ export const getTicketByIdService = async (ticketId: string): Promise<TicketOutp
   } catch (error: any) {
     throw new NotFoundError('Invalid ticket')
   }
+}
+
+export const getTicketsByCategoryService = async (
+  eventId: string
+): Promise<TicketOutputSimple[]> => {
+  const tickets = await prisma.tickets.findMany({
+    select: {
+      id: true,
+      transaction: {
+        select: {
+          category: true
+        }
+      }
+    },
+    where: {
+      transaction: {
+        order: {
+          eventId
+        }
+      }
+    }
+  })
+
+  const ticketsMapped = tickets.map((tix) => {
+    return {
+      id: tix.id,
+      category: tix.transaction.category
+    }
+  })
+
+  return ticketsMapped
 }

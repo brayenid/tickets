@@ -1,11 +1,18 @@
 import { MidtransError } from 'midtrans-client'
-import type { MidtransPayload, MidtransSnap, MidtransResponse, ItemDetails } from '../../interfaces/Midtrans'
+import type {
+  MidtransPayload,
+  MidtransSnap,
+  MidtransResponse,
+  ItemDetails
+} from '../../interfaces/Midtrans'
 import { prisma } from '../../utils/Db'
 import { midtrans } from '../../utils/Midtrans'
 import type { Transaction } from '../../interfaces/Transaction'
 import { logger } from '../../utils/Logger'
 
-export const addTransactionService = async (payload: MidtransPayload): Promise<MidtransResponse | undefined> => {
+export const addTransactionService = async (
+  payload: MidtransPayload
+): Promise<MidtransResponse | undefined> => {
   const { id, fee, customer, items } = payload
 
   /* SUM TOTAL PRICE OF ITEMS AND ADD FEE */
@@ -178,4 +185,35 @@ export const getTransactionByOrderIdService = async (orderId: string): Promise<T
   })
 
   return transactions
+}
+
+export const getTransactionsAmountTotalService = async (eventId: string): Promise<number> => {
+  const total = await prisma.orderItems.aggregate({
+    _sum: {
+      amount: true
+    },
+    where: {
+      order: {
+        AND: [
+          {
+            OR: [
+              {
+                status: 'settlement'
+              },
+              {
+                status: 'capture'
+              }
+            ]
+          },
+          {
+            event: {
+              id: eventId
+            }
+          }
+        ]
+      }
+    }
+  })
+
+  return total._sum.amount ?? 0
 }

@@ -8,6 +8,7 @@ import {
   getEventAttendersService,
   getEventByIdService,
   getEventsService,
+  getEventsTotalService,
   updateEventService
 } from '../../services/events'
 import { getUrlPath } from '../../utils/ImgUpload'
@@ -16,7 +17,8 @@ import type { FileRequest } from '../../interfaces/Express'
 import path from 'path'
 import { groupByAgeFreq } from '../../utils/helpers/GroupAge'
 import { groupByGenderFreq } from '../../utils/helpers/GroupGender'
-import { getVendorByUserIdService } from '../../services/users'
+import { getUserCompleteService } from '../../services/users'
+import { logger } from '../../utils/Logger'
 
 export const addEvent = async (req: FileRequest, res: Response): Promise<Response> => {
   const { name, date, description, location, vendorId }: EventBasic = req.body
@@ -47,7 +49,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
       vendorId
     })
 
-    await getVendorByUserIdService(String(vendorId))
+    await getUserCompleteService(String(vendorId), 'vendor')
 
     await addEventService({
       name,
@@ -59,7 +61,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
       vendorId
     })
 
-    return res.status(200).json({
+    return res.status(201).json({
       status: 'success',
       message: 'Event created successfully'
     })
@@ -94,7 +96,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
 }
 
 export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
-  const { date, description, location, name, vendorId } = req.body
+  const { date, description, location, name, vendorId, isOpen } = req.body
   const uploadedThumbnail = getUrlPath(req?.file, 8, 9)
   const { eventId: id } = req.params
 
@@ -104,7 +106,8 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       date: z.string(),
       description: z.string(),
       location: z.string(),
-      vendorId: z.string()
+      vendorId: z.string(),
+      isOpen: z.boolean()
     })
 
     eventSchema.parse({
@@ -112,7 +115,8 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       date,
       description,
       location,
-      vendorId
+      vendorId,
+      isOpen: Boolean(Number(isOpen))
     })
 
     /**
@@ -159,7 +163,8 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       location,
       name,
       vendorId,
-      thumbnail: req.file ? uploadedThumbnail : currentThumbnail
+      thumbnail: req.file ? uploadedThumbnail : currentThumbnail,
+      isOpen: Boolean(Number(isOpen))
     })
 
     return res.status(200).json({
@@ -167,10 +172,14 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       message: 'Event updated successfully'
     })
   } catch (error: any) {
+    console.log(error)
+
     if (req.file) {
       await fs.unlink(req.file?.path)
     }
     if (error instanceof z.ZodError) {
+      console.log(error)
+
       return res.status(400).json({
         status: 'fail',
         message: 'Bad payload',
@@ -192,11 +201,11 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
       })
     }
 
-    console.log(error)
+    logger.error(error.message)
 
     return res.status(500).json({
       status: 'fail',
-      message: error.message
+      message: 'Server error'
     })
   }
 }
@@ -244,9 +253,13 @@ export const getEvents = async (req: Request, res: Response): Promise<Response> 
 
   try {
     const events = await getEventsService(search as string, pageLimit, pageNumber)
+    const eventsTotal = await getEventsTotalService()
 
     return res.status(200).json({
       status: 'success',
+      meta: {
+        length: eventsTotal
+      },
       data: events
     })
   } catch (error: any) {

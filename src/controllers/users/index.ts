@@ -12,14 +12,13 @@ import {
   createSudoService,
   deleteUserService,
   getUserByIdService,
-  getUsersService,
   resetUserPasswordService,
   updateUserService
 } from '../../services/users'
 import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 
 export const addUser = async (req: Request, res: Response): Promise<Response> => {
-  const { name, email, password, role }: UserRequestBody = req.body
+  const { name, email, password, role, address, birth, phone }: UserRequestBody = req.body
   const id: string = nanoid(16)
 
   try {
@@ -39,12 +38,15 @@ export const addUser = async (req: Request, res: Response): Promise<Response> =>
       password: hashedPassword,
       email,
       role,
-      isActive: true
+      isActive: true,
+      address: address ?? 'Sendawar',
+      birth: birth ?? '1970-01-01',
+      phone: phone ?? '0'
     }
 
     await addUserService(payload)
 
-    return res.status(200).json({
+    return res.status(201).json({
       status: 'success',
       message: 'Account successfully created'
     })
@@ -133,30 +135,6 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
     })
   } catch (error: any) {
     if (error instanceof PrismaError || error instanceof BadRequestError) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message
-      })
-    }
-
-    return res.status(500).json({
-      status: 'fail',
-      message: error.message
-    })
-  }
-}
-
-export const getUsers = async (req: Request, res: Response): Promise<Response> => {
-  const { search, limit } = req.query
-
-  try {
-    const users = await getUsersService(search as string, limit ? Number(limit) : 10)
-    return res.status(200).json({
-      status: 'success',
-      data: users
-    })
-  } catch (error: any) {
-    if (error instanceof PrismaError) {
       return res.status(400).json({
         status: 'fail',
         message: error.message

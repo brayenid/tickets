@@ -2,6 +2,7 @@ import type { EventAttenders, EventPayload, EventStatus } from '../../interfaces
 import { countAge } from '../../utils/helpers/CountAge'
 import { Prisma, prisma } from '../../utils/Db'
 import { BadRequestError, PrismaError } from '../../utils/Errors'
+import { redis } from '../../utils/Redis'
 
 export const addEventService = async (payload: EventPayload): Promise<void> => {
   const { id, date, description, location, name, thumbnail, vendorId } = payload
@@ -119,7 +120,8 @@ export const getEventByIdService = async (id: string): Promise<EventPayload> => 
       thumbnail: true,
       Vendor: {
         select: {
-          name: true
+          name: true,
+          id: true
         }
       }
     },
@@ -135,14 +137,15 @@ export const getEventByIdService = async (id: string): Promise<EventPayload> => 
     date: event?.date ?? '',
     description: event?.description ?? '',
     thumbnail: event?.thumbnail ?? '',
-    vendor: event?.Vendor.name ?? ''
+    vendor: event?.Vendor.name ?? '',
+    vendorId: event?.Vendor.id ?? ''
   }
 
   return eventMapped
 }
 
 export const updateEventService = async (payload: EventPayload): Promise<void> => {
-  const { id, date, description, location, name, vendorId, thumbnail } = payload
+  const { id, date, description, location, name, vendorId, thumbnail, isOpen } = payload
   const currentTime = new Date()
 
   const getEventInfo = await prisma.events.findMany({
@@ -166,7 +169,8 @@ export const updateEventService = async (payload: EventPayload): Promise<void> =
       name,
       updatedAt: currentTime,
       vendorId,
-      thumbnail
+      thumbnail,
+      isOpen
     },
     where: {
       id
@@ -270,4 +274,60 @@ export const getEventStatusService = async (eventId: string): Promise<EventStatu
   })
 
   return event
+}
+
+export const getEventsTotalService = async (
+  search: string = '',
+  page: number = 0,
+  limit: number = 0
+): Promise<number> => {
+  let eventsTotal: number = 0
+
+  if (page || limit || search) {
+    const eventTotalFromDb = await prisma.events.aggregate({
+      _count: {
+        id: true
+      },
+      where: {
+        OR: [
+          {
+            name: {
+              contains: search
+            }
+          },
+          {
+            location: {
+              contains: search
+            }
+          },
+          {
+            Vendor: {
+              name: {
+                contains: search
+              }
+            }
+          }
+        ]
+      }
+    })
+
+    eventsTotal = eventTotalFromDb._count.id
+  } else {
+    const eventsFromCache = await redis.get('events:total')
+
+    if (eventsFromCache) {
+      eventsTotal = Number(eventsFromCache)
+    } else {
+      const eventTotalFromDb = await prisma.events.aggregate({
+        _count: {
+          id: true
+        }
+      })
+
+      eventsTotal = eventTotalFromDb._count.id
+      await redis.setex('events:total', 900, eventsTotal)
+    }
+  }
+
+  return eventsTotal
 }

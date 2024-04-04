@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <h2 class="truncate">${ticket.event.name} - ${ticket.category}</h2>
               <div class="item-meta">
-                <p>Held on : ${formatDate(ticket.event.date)}</p>
+                <p>Held on : ${formatISODate(ticket.event.date)}</p>
               </div>
             </div>
         </div>

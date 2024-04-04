@@ -4,7 +4,6 @@ import {
   createSudo,
   deleteUser,
   getUser,
-  getUsers,
   resetUserPassword,
   updateUser
 } from '../controllers/users'
@@ -38,8 +37,13 @@ import { addCustomer, updateCustomer } from '../controllers/customer-acc'
 import { limit } from '../utils/RateLimiter'
 import { addOfflineTransaction, addTransaction } from '../controllers/transactions'
 import { processTransactionNotif } from '../controllers/transactions/notification'
-import { getTicketsById, getTicketsByUserId } from '../controllers/tickets'
-import { getOrderById, getOrdersByUserId } from '../controllers/orders'
+import { getTicketsByCategory, getTicketsById, getTicketsByUserId } from '../controllers/tickets'
+import {
+  getOrderById,
+  getOrdersByDay,
+  getOrdersByEventIdSource,
+  getOrdersByUserId
+} from '../controllers/orders'
 
 const router: Router = Router()
 
@@ -57,7 +61,6 @@ const limitEmailVerification = limit(12)
 router.post('/users', sudoAuth.validate, addUser)
 router.patch('/users/:userId', sudoAuth.validate, updateUser)
 router.delete('/users/:userId', sudoAuth.validate, deleteUser)
-router.get('/users', sudoAuth.validate, getUsers)
 router.get('/users/detail', getUser)
 router.patch('/credential', auth.validateSession, patchPassword)
 router.patch('/credential/reset', adminAuth.validate, resetUserPassword)
@@ -93,6 +96,8 @@ router.get('/statistic/events/attenders/:eventId/gender', getEventAttendersGende
 /* ORDERS */
 router.get('/orders/detail', customerAuth.validate, getOrdersByUserId)
 router.get('/orders/detail/:orderId', customerAuthLoose.validate, getOrderById)
+router.get('/statistic/orders/:eventId/source', adminAuth.validate, getOrdersByEventIdSource)
+router.get('/statistic/orders/:eventId/date', adminAuth.validate, getOrdersByDay)
 
 /* TRANSACTIONS */
 router.post('/transaction', customerAuth.validate, addTransaction)
@@ -104,5 +109,6 @@ router.post('/notification/transaction', processTransactionNotif)
 /* TICKETS */
 router.get('/tickets/user', customerAuth.validate, getTicketsByUserId)
 router.get('/tickets/detail/:ticketId', customerAuthLoose.validate, getTicketsById)
+router.get('/statistic/tickets/:eventId/category', adminAuth.validate, getTicketsByCategory)
 
 export default router

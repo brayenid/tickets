@@ -7,6 +7,7 @@ export interface UserRequestBody {
   birth?: string
   registerId?: string
   gender?: string
+  phone?: string
 }
 
 export interface User extends UserRequestBody {
@@ -19,6 +20,9 @@ export interface Users {
   name: string
   email: string
   role: string
+  birth?: string
+  address?: string
+  phone?: string
   password?: string
   createdAt?: number
 }

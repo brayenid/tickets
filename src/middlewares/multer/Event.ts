@@ -12,11 +12,18 @@ const eventFileUpload = (storage: StorageEngine): Multer => {
   return multer({
     storage,
     limits: {
-      fileSize: 1024 * 1024 // 1 mb
+      fileSize: 512 * 1024 // 512kb
     },
     fileFilter: (req: FileRequest, file: Express.Multer.File, callback: FileFilterCallback) => {
       const ext = path.extname(file.originalname)
-      if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png' && ext !== '.JPG' && ext !== '.JPEG' && ext !== '.PNG') {
+      if (
+        ext !== '.jpg' &&
+        ext !== '.jpeg' &&
+        ext !== '.png' &&
+        ext !== '.JPG' &&
+        ext !== '.JPEG' &&
+        ext !== '.PNG'
+      ) {
         callback(new Error('Unsupported file type'))
         return
       }
@@ -48,7 +55,11 @@ const eventThumbnailStorage = multer.diskStorage({
 const eventThumbnailUpload = eventFileUpload(eventThumbnailStorage)
 const eventThumbnail = eventThumbnailUpload.single('eventThumbnail')
 
-export const eventThumbnailMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const eventThumbnailMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   eventThumbnail(req, res, async (error) => {
     if (error) {
       if (error instanceof multer.MulterError) {

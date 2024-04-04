@@ -7,8 +7,33 @@
           {{ event.name }} -
           <span class="vendor">{{ event.vendor }}</span>
         </h1>
-        <div class="meta-info">
-          <p class="mb-2">{{ event.location }} - {{formatDate event.date }}</p>
+        <div class="meta-info mb-4 flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4 text-gray-500"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="currentColor"
+                d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"
+              />
+            </svg>
+            <p>{{ event.location }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4 text-gray-500"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="currentColor"
+                d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1"
+              />
+            </svg>
+            <p>{{formatISODate event.date }}</p>
+          </div>
           <div class="{{#if event.isOpen}}primary-badge{{else}}red-badge{{/if}}">
             {{#if event.isOpen}}
             Sale
@@ -31,7 +56,7 @@
           >Detail :
         </span>
       </h2>
-      <p class="description">{{ event.description }}</p>
+      <p class="description">{{{ event.description }}}</p>
       {{> share }}
     </div>
     <div class="book-stuff md:flex-[1]">

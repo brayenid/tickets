@@ -1,0 +1,104 @@
+<div class="relative md:p-4 w-full md:max-w-3xl max-h-full">
+  <!-- Modal content -->
+  <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+    <!-- Modal header -->
+    <div
+      class="flex items-center justify-between p-4 md:p-5 border-b md:rounded-t dark:border-gray-600"
+    >
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create New Customer</h3>
+      <button
+        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-toggle="crud-modal"
+      >
+        <svg
+          class="w-3 h-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 14 14"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+          />
+        </svg>
+        <span class="sr-only">Close modal</span>
+      </button>
+    </div>
+    <!-- Modal body -->
+    <form id="create-customer" class="p-4">
+      <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
+        <div>
+          <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Name</label
+          >
+          <input type="text" name="name" id="name" placeholder="Type customer name" required="" />
+        </div>
+        <div>
+          <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Email</label
+          >
+          <input type="email" name="email" id="email" placeholder="Customer email" required="" />
+        </div>
+        <div>
+          <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Phone</label
+          >
+          <input
+            type="tel"
+            name="phone"
+            id="phone"
+            class="input-styled"
+            placeholder="Customer phone"
+            required=""
+          />
+        </div>
+        <div>
+          <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Address</label
+          >
+          <input
+            type="text"
+            name="address"
+            id="address"
+            class="input-styled"
+            placeholder="Customer address"
+            required=""
+          />
+        </div>
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="birth"
+            >Birth
+          </label>
+          <input
+            type="date"
+            name="birth"
+            id="birth"
+            class="input-styled"
+            placeholder="Customer established/joined"
+            required=""
+          />
+        </div>
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="password"
+            >Temporary Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            class="input-styled"
+            placeholder="****"
+            required=""
+          />
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button type="submit" id="add-customer-btn">Add Customer</button>
+      </div>
+    </form>
+  </div>
+</div>

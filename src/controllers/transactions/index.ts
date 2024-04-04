@@ -107,8 +107,6 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
       }
     })
   } catch (error: any) {
-    console.log(error)
-
     /*
     ERROR POSSIBILITY :
     - Invalid Event ID

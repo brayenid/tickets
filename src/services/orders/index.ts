@@ -157,3 +157,102 @@ export const getOrdersByUserIdService = async (userId: string): Promise<OrderOut
 
   return ordersMapped
 }
+
+// SETTLEMENT ORDERS ONLY
+export const getOrdersByEventIdService = async (eventId: string): Promise<OrderOutput[]> => {
+  const orders = await prisma.orders.findMany({
+    select: {
+      id: true,
+      status: true,
+      source: true,
+      updatedAt: true,
+      event: {
+        select: {
+          name: true,
+          thumbnail: true
+        }
+      }
+    },
+    where: {
+      AND: [
+        {
+          eventId
+        },
+        {
+          OR: [
+            {
+              status: 'settlement'
+            },
+            {
+              status: 'capture'
+            }
+          ]
+        }
+      ]
+    },
+    orderBy: {
+      updatedAt: 'desc'
+    }
+  })
+
+  const ordersMapped = orders.map((order) => {
+    return {
+      id: order.id,
+      status: order.status,
+      source: order.source,
+      eventName: order.event.name,
+      updatedAt: order.updatedAt
+    }
+  })
+
+  return ordersMapped
+}
+
+export const getOrdersByDayService = async (eventId: string): Promise<OrderOutput[]> => {
+  const orders = await prisma.orders.findMany({
+    select: {
+      id: true,
+      status: true,
+      source: true,
+      updatedAt: true,
+      event: {
+        select: {
+          name: true,
+          thumbnail: true
+        }
+      }
+    },
+    where: {
+      AND: [
+        {
+          eventId
+        },
+        {
+          OR: [
+            {
+              status: 'settlement'
+            },
+            {
+              status: 'capture'
+            }
+          ]
+        }
+      ]
+    },
+    orderBy: {
+      updatedAt: 'asc'
+    }
+  })
+
+  const ordersMapped = orders.map((order) => {
+    return {
+      id: order.id,
+      status: order.status,
+      source: order.source,
+      eventName: order.event.name,
+      updatedAt: order.updatedAt
+    }
+  })
+
+  return ordersMapped
+}

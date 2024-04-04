@@ -1,3 +1,5 @@
+{{!-- Compatible in main-layout --}}
+
 <nav
   class="bg-teal-800 border-teal-200 dark:bg-gray-900 dark:border-gray-700 fixed w-full top-0 z-10"
 >
@@ -32,6 +34,7 @@
       <ul
         class="flex flex-col md:items-center gap-2 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700"
       >
+        {{#isEqual user.role 'customer'}}
         <li>
           <a
             href="/user/orders"
@@ -46,6 +49,7 @@
             >Tickets</a
           >
         </li>
+        {{/isEqual}}
         {{#if user}}
         <li>
           {{> account-dropdown }}

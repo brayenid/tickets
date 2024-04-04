@@ -27,3 +27,8 @@ export interface TicketOutput {
     location?: string
   }
 }
+
+export interface TicketOutputSimple {
+  id: string
+  category: string
+}
