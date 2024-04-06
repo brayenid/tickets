@@ -3,7 +3,7 @@ const quill = new Quill('#editor', {
   modules: {
     toolbar: true
   },
-  placeholder: 'Write event decription...',
+  placeholder: 'Buat deskripsi ...',
   theme: 'snow'
 })
 
@@ -56,11 +56,12 @@ const addEvent = async () => {
   formData.append('description', eventDesc)
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Add New Event',
-    text: 'Are you sure to add new event?',
+    title: 'Tambah Event Baru',
+    text: 'Kamu yakin menambah event baru?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Add'
+    confirmButtonText: 'Tambah',
+    cancelButtonText: 'Batal'
   })
   if (isConfirmed) {
     addEventLoading(true)

@@ -12,29 +12,29 @@
           <label
             for="event-name"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Event Name</label
+            >Nama Event</label
           >
           <input
             type="text"
             name="name"
             id="event-name"
             class="input-styled"
-            placeholder="Type event name"
+            placeholder="Masukan nama event"
             required=""
             value="{{ event.name }}"
           />
         </div>
         <div class="w-full">
           <label for="is-open" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Open To Sale</label
+            >Status Penjualan</label
           >
           <select id="is-open" class="input-styled">
             {{#isSelected true event.isOpen}}
-            <option value="1" selected>Open</option>
+            <option value="1" selected>Buka</option>
             <option value="0">Close</option>
             {{else}}
             <option value="1">Open</option>
-            <option value="0" selected>Close</option>
+            <option value="0" selected>Tutup</option>
             {{/isSelected}}
           </select>
         </div>
@@ -42,14 +42,14 @@
           <label
             for="event-location"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Location</label
+            >Lokasi</label
           >
           <input
             type="text"
             name="event-location"
             id="event-location"
             class="input-styled"
-            placeholder="Event event location"
+            placeholder="Masukan lokasi event"
             required=""
             value="{{ event.location }}"
           />
@@ -58,7 +58,7 @@
           <label
             for="event-date"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Date</label
+            >Waktu Penyelenggaraan</label
           >
           <input
             type="datetime-local"
@@ -105,7 +105,7 @@
         </div>
         <div class="sm:col-span-2">
           <label for="editor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Description</label
+            >Deskripsi</label
           >
           <div class="ql-container-customed">
             <div id="editor"></div>
@@ -113,36 +113,36 @@
         </div>
       </div>
       <div class="flex justify-end mt-4 gap-2">
-        <button type="submit" id="event-update-btn">Update Event</button>
-        <button type="button" class="red" onclick="deleteEvent('{{ event.id }}')">Delete</button>
+        <button type="submit" id="event-update-btn">Perbaharui Event</button>
+        <button type="button" class="red" onclick="deleteEvent('{{ event.id }}')">Hapus</button>
       </div>
     </form>
   </section>
 
   {{!-- Add Event Prices --}}
   <section class="bg-white p-6 shadow-sm rounded-lg" id="price-list">
-    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Price List</h2>
+    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Daftar Harga</h2>
     <form id="event-price">
       <div class="grid gap-2 sm:grid-cols-2 md:grid-cols-4 sm:gap-3">
         <div class="w-full">
           <label
             for="price-name"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Price Name</label
+            >Kategori Harga</label
           >
-          <input type="text" id="price-name" placeholder="Type price name" required="" />
+          <input type="text" id="price-name" placeholder="Masukan kategori harga" required="" />
         </div>
         <div class="w-full">
           <label
             for="price-amount"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Amount</label
+            >Harga</label
           >
           <input
             type="text"
             inputmode="numeric"
             id="price-amount"
-            placeholder="Type price amount"
+            placeholder="Masukan harga"
             required=""
           />
         </div>
@@ -150,13 +150,13 @@
           <label
             for="price-stock"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Stock</label
+            >Stok</label
           >
           <input
             type="number"
             id="price-stock"
             class="input-styled"
-            placeholder="Price stock"
+            placeholder="Masukan stok harga"
             required=""
           />
         </div>
@@ -164,19 +164,19 @@
           <label
             for="price-grade"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Grade</label
+            >Kelas Harga</label
           >
           <input
             type="number"
             id="price-grade"
             class="input-styled"
-            placeholder="Price grade"
+            placeholder="Masukan kelas harga"
             required=""
           />
         </div>
       </div>
       <div class="flex justify-end">
-        <button type="submit" class="mt-4">Add Price</button>
+        <button type="submit" class="mt-4">Tambah</button>
       </div>
     </form>
 
@@ -186,12 +186,12 @@
           class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
         >
           <tr>
-            <th scope="col" class="px-4 py-3">Name</th>
-            <th scope="col" class="px-4 py-3">Price</th>
-            <th scope="col" class="px-4 py-3">Stock</th>
-            <th scope="col" class="px-4 py-3">Grade</th>
+            <th scope="col" class="px-4 py-3">Nama</th>
+            <th scope="col" class="px-4 py-3">Harga</th>
+            <th scope="col" class="px-4 py-3">Stok</th>
+            <th scope="col" class="px-4 py-3">Kelas</th>
             <th scope="col" class="px-4 py-3">
-              <span class="sr-only">Actions</span>
+              <span class="sr-only">Aksi</span>
             </th>
           </tr>
         </thead>
@@ -209,13 +209,13 @@
             <td class="px-4 py-3">{{ stock }}</td>
             <td class="px-4 py-3">{{ grade }}</td>
             <td class="px-4 py-3 text-center">
-              <button onclick="deleteEventPrice('{{ id }}')">Delete</button>
+              <button onclick="deleteEventPrice('{{ id }}')">Hapus</button>
             </td>
           </tr>
           {{/each}}
           {{else}}
           <tr class="text-center">
-            <td class="px-4 py-3" colspan="5">No Price</td>
+            <td class="px-4 py-3" colspan="5">Tidak ada data</td>
           </tr>
           {{/moreThanZero}}
         </tbody>
@@ -224,5 +224,4 @@
   </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.4/dist/quill.js"></script>
-
 <script src="/script/dashboard/events/event-detail.js"></script>

@@ -159,3 +159,120 @@ export const getTicketsByCategoryService = async (
 
   return ticketsMapped
 }
+
+export const getTicketsService = async (
+  search: string = '',
+  limit: number,
+  pageNumber: number
+): Promise<TicketOutput[]> => {
+  const offset = (pageNumber - 1) * limit
+
+  const tickets = await prisma.tickets.findMany({
+    where: {
+      OR: [
+        {
+          id: {
+            contains: search
+          }
+        },
+        {
+          transaction: {
+            order: {
+              eventId: {
+                contains: search
+              }
+            }
+          }
+        },
+        {
+          transaction: {
+            orderId: {
+              contains: search
+            }
+          }
+        }
+      ]
+    },
+    take: limit,
+    skip: offset,
+    include: {
+      transaction: {
+        select: {
+          category: true,
+          order: {
+            select: {
+              event: {
+                select: {
+                  id: true,
+                  name: true,
+                  date: true,
+                  thumbnail: true
+                }
+              },
+              user: {
+                select: {
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+
+  const formattedTickets = tickets.map((ticket) => ({
+    id: ticket.id ?? '',
+    transactionId: ticket.transactionId,
+    category: ticket.transaction.category,
+    isActive: ticket.isActive,
+    createdAt: ticket.createdAt,
+    updatedAt: ticket.updatedAt,
+    user: ticket.transaction.order?.user.name,
+    event: {
+      id: ticket.transaction.order?.event.id ?? '',
+      name: ticket.transaction.order?.event.name ?? '',
+      date: ticket.transaction.order?.event.date ?? '',
+      thumbnail: ticket.transaction.order?.event.thumbnail ?? ''
+    }
+  }))
+  return formattedTickets
+}
+
+export const getTicketTotalService = async (search: string = ''): Promise<number> => {
+  const total = await prisma.tickets.aggregate({
+    _count: {
+      id: true
+    },
+    where: {
+      OR: [
+        {
+          id: {
+            contains: search
+          }
+        },
+        {
+          transaction: {
+            order: {
+              eventId: {
+                contains: search
+              }
+            }
+          }
+        },
+        {
+          transaction: {
+            orderId: {
+              contains: search
+            }
+          }
+        }
+      ]
+    }
+  })
+
+  return total._count.id
+}

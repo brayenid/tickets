@@ -14,6 +14,9 @@ import {
   eventDetailDashboard,
   eventSummaryDashboard,
   main,
+  orderDetailDashboard,
+  orderList,
+  ticketList,
   vendorDetailDashboard
 } from '../controllers/views/dashboard'
 
@@ -45,5 +48,8 @@ router.get('/dashboard/vendors', adminAuth.validate, createVendors)
 router.get('/dashboard/vendors/:userId', adminAuth.validate, vendorDetailDashboard)
 router.get('/dashboard/customers', adminAuth.validate, createCustomer)
 router.get('/dashboard/customers/:userId', adminAuth.validate, customerDetailDashboard)
+router.get('/dashboard/orders', adminAuth.validate, orderList)
+router.get('/dashboard/orders/:orderId', adminAuth.validate, orderDetailDashboard)
+router.get('/dashboard/tickets', adminAuth.validate, ticketList)
 
 export default router

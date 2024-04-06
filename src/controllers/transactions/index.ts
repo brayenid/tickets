@@ -27,7 +27,7 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
   try {
     const getEventStatus = await getEventStatusService(eventId as string)
     if (!getEventStatus.isOpen) {
-      throw new BadRequestError('Event is not on sale')
+      throw new BadRequestError('Event tidak dibuka untuk dijual')
     }
 
     const orderSchema = z.object({
@@ -100,7 +100,7 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
 
     return res.status(201).json({
       status: 'success',
-      message: 'Transaction created',
+      message: 'Order berhasil dibuat',
       data: {
         id,
         ...transactionToken
@@ -176,7 +176,7 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
     const { role, name } = await getUserByIdService(userId as string)
 
     if (role !== 'customer') {
-      throw new BadRequestError('Invalid account role, only for customer')
+      throw new BadRequestError('Hanya untuk customer')
     }
 
     /* CREATE AN ORDER ID RECORD */

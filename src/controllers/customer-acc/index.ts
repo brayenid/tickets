@@ -50,7 +50,7 @@ export const addCustomer = async (req: Request, res: Response): Promise<Response
 
     return res.status(200).json({
       status: 'success',
-      message: 'Account successfully created'
+      message: 'Akun berhasil dibuat'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -97,7 +97,7 @@ export const updateCustomer = async (req: Request, res: Response): Promise<Respo
 
     return res.status(200).json({
       status: 'success',
-      message: 'Account updated successfully'
+      message: 'Akun berhasil diubah'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {

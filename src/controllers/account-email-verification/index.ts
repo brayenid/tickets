@@ -20,7 +20,7 @@ export const addEmailVerification = async (req: Request, res: Response): Promise
 
     const user = await getUserByEmailService(email as string)
     if (user) {
-      throw new BadRequestError('Email already taken')
+      throw new BadRequestError('Email sudah dipakai')
     }
 
     await setKeyService({ email, key })
@@ -32,7 +32,7 @@ export const addEmailVerification = async (req: Request, res: Response): Promise
 
     return res.status(201).json({
       status: 'success',
-      message: 'Verification token has sent to your email'
+      message: 'Token verifikasi telah dikirim ke email kamu'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -80,7 +80,7 @@ export const verifyEmailActivation = async (req: Request, res: Response): Promis
 
     return res.status(200).json({
       status: 'success',
-      message: 'Email verifed successfully',
+      message: 'Verifikasi email berhasil',
       data: id
     })
   } catch (error: any) {

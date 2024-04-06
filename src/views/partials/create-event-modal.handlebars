@@ -5,7 +5,7 @@
     <div
       class="flex items-center justify-between p-4 md:p-5 border-b md:rounded-t dark:border-gray-600"
     >
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create New Event</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Buat Event Baru</h3>
       <button
         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
         data-modal-toggle="crud-modal"
@@ -35,13 +35,13 @@
           <label
             for="event-name"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Event Name</label
+            >Nama Event</label
           >
           <input
             type="text"
             name="name"
             id="event-name"
-            placeholder="Type event name"
+            placeholder="Masukan nama event"
             required=""
           />
         </div>
@@ -49,13 +49,13 @@
           <label
             for="event-location"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Location</label
+            >Lokasi</label
           >
           <input
             type="text"
             name="event-location"
             id="event-location"
-            placeholder="Event event location"
+            placeholder="Masukan lokasi event"
             required=""
           />
         </div>
@@ -63,7 +63,7 @@
           <label
             for="event-date"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Date</label
+            >Waktu Penyelenggaraan</label
           >
           <input
             type="datetime-local"
@@ -81,7 +81,7 @@
             >Vendor</label
           >
           <select id="vendor-id" class="input-styled">
-            <option selected="">Select Vendor</option>
+            <option selected="">Pilih Vendor</option>
             {{#each vendors}}
             <option value="{{ id }}">{{ name }}</option>
             {{/each}}
@@ -100,7 +100,7 @@
         </div>
         <div class="sm:col-span-2">
           <label for="editor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Description</label
+            >Deskripsi</label
           >
           <div class="ql-container-customed">
             <div id="editor"></div>
@@ -108,7 +108,7 @@
         </div>
       </div>
       <div class="flex justify-end mt-4">
-        <button type="submit" id="add-event-btn">Add Event</button>
+        <button type="submit" id="add-event-btn">Tambah</button>
       </div>
     </form>
   </div>

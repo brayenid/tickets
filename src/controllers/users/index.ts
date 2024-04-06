@@ -48,7 +48,7 @@ export const addUser = async (req: Request, res: Response): Promise<Response> =>
 
     return res.status(201).json({
       status: 'success',
-      message: 'Account successfully created'
+      message: 'Akun berhasil dibuat'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -94,7 +94,7 @@ export const updateUser = async (req: Request, res: Response): Promise<Response>
 
     return res.status(200).json({
       status: 'success',
-      message: 'Account updated successfully'
+      message: 'Akun berhasil diubah'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -125,13 +125,13 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
   try {
     const user = await getUserByIdService(userId)
     if (user.role === 'sudo') {
-      throw new BadRequestError('The one and only, your majesty, SUDO could not be deleted!')
+      throw new BadRequestError('Super admin tidak bisa dihapus')
     }
     await deleteUserService(userId)
 
     return res.status(200).json({
       status: 'success',
-      message: 'Account successfully deleted'
+      message: 'Akun berhasil dihapus'
     })
   } catch (error: any) {
     if (error instanceof PrismaError || error instanceof BadRequestError) {
@@ -221,7 +221,7 @@ export const resetUserPassword = async (req: Request, res: Response): Promise<Re
 
     return res.status(200).json({
       status: 'success',
-      message: 'Password successfully changed'
+      message: 'Password berhasil diubah'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {

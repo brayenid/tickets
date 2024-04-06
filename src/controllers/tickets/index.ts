@@ -7,6 +7,7 @@ import {
 import { AuthError, BadRequestError, NotFoundError } from '../../utils/Errors'
 import { logger } from '../../utils/Logger'
 import { groupByTixCatFreq } from '../../utils/helpers/GroupByTicketCat'
+import { generateTicketDirectRes } from '../../utils/TicketPDFGenerator'
 
 export const getTicketsByUserId = async (req: Request, res: Response): Promise<Response> => {
   const session = req.session.user
@@ -53,7 +54,7 @@ export const getTicketsById = async (req: Request, res: Response): Promise<Respo
     const accessList = ['admin', 'sudo']
 
     if (session?.id !== ticket.userId && !accessList.includes(String(session?.role))) {
-      throw new AuthError('You are not authorized to access this resource')
+      throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
     }
 
     return res.status(200).json({
@@ -108,6 +109,37 @@ export const getTicketsByCategory = async (req: Request, res: Response): Promise
     }
 
     logger.error(error.message)
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
+    })
+  }
+}
+
+export const ticketToPdfDirect = async (
+  req: Request,
+  res: Response
+): Promise<Response | undefined> => {
+  const { ticketId } = req.params
+  const session = req.session.user
+  try {
+    const accessList = ['admin', 'sudo']
+    const ticket = await getTicketByIdService(ticketId)
+
+    if (session?.id !== ticket.userId && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
+    }
+
+    const ticketBuffer = await generateTicketDirectRes(ticket)
+    const fileName = `${ticketId}_${Date.now()}_DRCT.pdf`
+
+    res
+      .status(200)
+      .type('pdf')
+      .set('Content-Disposition', `attachment; filename="${fileName}"`)
+      .send(ticketBuffer)
+  } catch (error) {
+    console.error(error)
     return res.status(500).json({
       status: 'fail',
       message: 'Server error'

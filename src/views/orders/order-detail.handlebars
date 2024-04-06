@@ -1,6 +1,6 @@
 <main id="order-detail" class="container" data-token="{{ order.paymentToken }}">
   {{> breadcrumbs }}
-  <h2 class="styled-h2 !my-5 !text-center">Order Detail</h2>
+  <h2 class="styled-h2 !my-5 !text-center">Detail Order</h2>
   <div class="flex gap-4 items-start">
     <div class="detail flex-[2.4] rounded-lg space-y-4 overflow-x-auto">
       <table
@@ -21,7 +21,7 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Event Name
+              Nama Event
             </th>
             <td class="px-6 py-4">: {{ order.eventName }}</td>
           </tr>
@@ -39,7 +39,7 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Source
+              Pembayaran Via
             </th>
             <td class="px-6 py-4">: {{ order.source }}</td>
           </tr>
@@ -56,8 +56,8 @@
           >
             <tr>
               <th scope="col" class="px-6 py-3">Transaction ID</th>
-              <th scope="col" class="px-6 py-3">Quantity</th>
-              <th scope="col" class="px-6 py-3">Price</th>
+              <th scope="col" class="px-6 py-3">Kuantitas</th>
+              <th scope="col" class="px-6 py-3">Harga</th>
             </tr>
           </thead>
           <tbody>

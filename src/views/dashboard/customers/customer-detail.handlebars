@@ -3,7 +3,9 @@
 
   {{!-- Edit Event --}}
   <section class="bg-white p-6 shadow-sm rounded-lg" id="detail">
-    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Detail : {{ vendor.name }}</h2>
+    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">
+      Detail : {{ customer.name }}
+    </h2>
     {{!-- Keep create vendor id to avoid repetitive css --}}
     <form id="create-vendor" class="p-4">
       <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
@@ -17,7 +19,7 @@
             id="name"
             placeholder="Type vendor name"
             required=""
-            value="{{ vendor.name }}"
+            value="{{ customer.name }}"
             disabled
           />
         </div>
@@ -31,7 +33,7 @@
             id="email"
             placeholder="Vendor email"
             required=""
-            value="{{ vendor.email }}"
+            value="{{ customer.email }}"
             disabled
           />
         </div>
@@ -46,7 +48,7 @@
             class="input-styled"
             placeholder="Vendor phone"
             required=""
-            value="{{ vendor.phone }}"
+            value="{{ customer.phone }}"
             disabled
           />
         </div>
@@ -61,7 +63,7 @@
             class="input-styled"
             placeholder="Vendor address"
             required=""
-            value="{{ vendor.address }}"
+            value="{{ customer.address }}"
             disabled
           />
         </div>
@@ -76,14 +78,14 @@
             class="input-styled"
             placeholder="Vendor established/joined"
             required=""
-            value="{{ vendor.birth }}"
+            value="{{ customer.birth }}"
             disabled
           />
         </div>
       </div>
       <div class="flex justify-end mt-4">
         <button type="submit" id="add-vendor-btn" class="cursor-not-allowed" disabled>
-          Update Vendor
+          Update Customer
         </button>
       </div>
     </form>

@@ -4,6 +4,7 @@ const $ = (selector) => document.querySelector(selector)
 const createCustomerForm = $('#create-customer')
 
 const addCustomerBtn = document.querySelector('#add-customer-btn')
+
 const addCustomerLoading = (isLoading) => {
   if (isLoading) {
     addCustomerBtn.innerHTML = `
@@ -27,7 +28,7 @@ const addCustomerLoading = (isLoading) => {
       `
     addCustomerBtn.setAttribute('disabled', '')
   } else {
-    addCustomerBtn.innerHTML = 'Add Customer'
+    addCustomerBtn.innerHTML = 'Tambah'
     addCustomerBtn.removeAttribute('disabled')
   }
 }
@@ -52,11 +53,12 @@ const addCustomer = async () => {
 
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Add New Customer',
-    text: 'Are you sure to add new customer?',
+    title: 'Tambah Pelanggan Baru',
+    text: 'Kamu yakin menambah pelanggan baru?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Add'
+    confirmButtonText: 'Tambah',
+    cancelButtonText: 'Batal'
   })
   if (isConfirmed) {
     addCustomerLoading(true)

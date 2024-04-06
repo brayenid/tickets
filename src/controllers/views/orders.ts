@@ -4,12 +4,12 @@ import { getOrderByIdService } from '../../services/orders'
 export const orders = (req: Request, res: Response): void => {
   const paths = [
     {
-      label: 'Order List',
+      label: 'Daftar Order',
       url: '/user/orders'
     }
   ]
   res.render('orders/orders', {
-    title: 'Your Orders',
+    title: 'Ordermu',
     paths
   })
 }
@@ -30,11 +30,11 @@ export const orderDetail = async (req: Request, res: Response): Promise<void> =>
 
   const paths = [
     {
-      label: 'Order List',
+      label: 'Daftar Order',
       url: '/user/orders'
     },
     {
-      label: 'Order Detail',
+      label: 'Detail Order',
       url: `/user/orders/${orderId}`
     }
   ]

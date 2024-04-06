@@ -7,9 +7,9 @@
     "serve": "set NODE_ENV=dev&& nodemon src/index.ts",
     "migrate": "npx prisma migrate dev --name tickets",
     "tailwind": "npx tailwindcss -i ./frontend/input.css -o ./public/style/index.css --watch",
-    "copyfile" : "copyfiles -u 1 src/views/**/*.handlebars dist",
+    "copyfile": "copyfiles -u 1 src/views/**/*.handlebars dist",
     "dev": "concurrently \"npm run serve\" \"npm run tailwind\" ",
-    "build" : "npx tsc && npm run copyfile"
+    "build": "npx tsc && npm run copyfile"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,8 @@
     "@types/express-session": "^1.18.0",
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.11.24",
+    "@types/node-cron": "^3.0.11",
+    "@types/qrcode": "^1.5.5",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "concurrently": "^8.2.2",
     "copyfiles": "^2.4.1",
@@ -37,6 +39,7 @@
   },
   "dependencies": {
     "@abdulrahmanreza/midtrans-client": "^1.0.2",
+    "@pdf-lib/fontkit": "^1.1.1",
     "@prisma/client": "^5.10.2",
     "@quixo3/prisma-session-store": "^3.1.13",
     "@types/multer": "^1.4.11",
@@ -52,7 +55,10 @@
     "multer": "^1.4.5-lts.1",
     "mustache": "^4.2.0",
     "nanoid": "^3.3.4",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.12",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.3",
     "winston": "^3.12.0",
     "zod": "^3.22.4"
   }

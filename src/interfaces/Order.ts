@@ -25,6 +25,7 @@ export interface OrderOutput {
   userId?: string
   paymentToken?: string
   redirectUrl?: string
+  createdAt?: Date
   updatedAt?: Date
   items?: OrderOutputItems[]
 }

@@ -35,7 +35,7 @@ class Auth {
       if (!session) {
         return res.status(403).json({
           status: 'fail',
-          message: 'Unauthenticated, please login'
+          message: 'Anda belum login'
         })
       }
 
@@ -57,16 +57,16 @@ class Auth {
     try {
       const role = session?.role
       if (!session) {
-        throw new ForbiddenError('Unauthenticated, please login')
+        throw new ForbiddenError('Kamu belum masuk')
       }
 
       if (this.fallbackRole.length > 0) {
         if (role !== this.role && !this.fallbackRole.includes(String(role))) {
-          throw new AuthError('You are not authorized to access this resource')
+          throw new AuthError('Kamu tidak memiliki akses untuk sumber daya ini')
         }
       } else {
         if (role !== this.role) {
-          throw new AuthError('You are not authorized to access this resource')
+          throw new AuthError('Kamu tidak memiliki akses untuk sumber daya ini')
         }
       }
 
@@ -81,7 +81,7 @@ class Auth {
       })
 
       if (userInfo.length < 1) {
-        throw new BadRequestError('Invalid session, we could not find a user with this ID.')
+        throw new BadRequestError('Invalid session, user ID tidak ditemukan.')
       }
 
       next()

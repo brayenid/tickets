@@ -16,6 +16,7 @@ export interface TicketOutput {
   orderId?: string
   category: string
   userId?: string
+  user?: string
   isActive: boolean
   createdAt: Date
   updatedAt: Date

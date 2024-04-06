@@ -27,7 +27,7 @@ export const addEventPrice = async (req: Request, res: Response): Promise<Respon
 
     return res.status(201).json({
       status: 'success',
-      message: 'New event price added successfully'
+      message: 'Kategori harga baru berhasil dibuat'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -103,7 +103,7 @@ export const deleteEventPrice = async (req: Request, res: Response): Promise<Res
 
     return res.status(200).json({
       status: 'success',
-      message: 'Price successfully deleted'
+      message: 'Kategori harga berhasil dihapus'
     })
   } catch (error: any) {
     if (error instanceof PrismaError || error instanceof BadRequestError) {

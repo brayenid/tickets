@@ -3,11 +3,15 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100 min-h-svh;
+  @apply bg-gray-100;
 }
 
 .icon {
   @apply w-5 h-5 text-gray-500;
+}
+
+footer {
+  @apply mt-10;
 }
 
 .container {
@@ -326,7 +330,7 @@ ol {
 }
 
 #ticket-detail .item {
-  @apply flex gap-4 flex-col sm:flex-row sm:items-start;
+  @apply flex gap-4 flex-col smd:flex-row smd:items-start;
 }
 
 /* DASHBOARD */

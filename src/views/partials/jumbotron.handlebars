@@ -1,9 +1,15 @@
 <section
-  class="bg-center bg-no-repeat bg-cover bg-[url('/assets/crowds.webp')] bg-primary-600 bg-blend-multiply w-full max-h-96 overflow-hidden rounded-lg"
+  class="bg-fixed bg-no-repeat bg-cover bg-[url('/assets/crowds.webp')] bg-primary-600 bg-blend-multiply h-2/3 flex flex-col justify-center items-center p-4 px-12"
 >
-  <div class="mx-auto text-center py-10 md:py-24 px-8">
-    <h1 class="mb-8 text-3xl font-extrabold tracking-normal text-white md:text-5xl lg:text-6xl">
-      Book your favorite events
+  <div class="mx-auto text-center">
+    <h1
+      class="mb-8 max-w-[500px] text-4xl sm:text-[2.8rem] font-extrabold leading-none tracking-tight text-white smd:text-6xl"
+    >
+      Pesan tiket event
+      <span
+        class="underline underline-offset-3 decoration-8 decoration-primary-400 dark:decoration-primary-600"
+        >favorit kamu!</span
+      >
     </h1>
     <div>
       {{> search-bar }}

@@ -19,7 +19,7 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
     })
 
     if (req.session.user) {
-      throw new BadRequestError('You are logged in')
+      throw new BadRequestError('Kamu sudah masuk')
     }
 
     const user = await getUserByEmailService(email as string)
@@ -27,7 +27,7 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
     if (!user) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Account does not exist'
+        message: 'Akun tidak ada'
       })
     }
 
@@ -38,7 +38,7 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
     const isMatched = await bcrypt.compare(password as string, user.password)
 
     if (!isMatched) {
-      throw new AuthError('Password is not matched')
+      throw new AuthError('Password tidak valid')
     }
 
     req.session.user = {
@@ -50,7 +50,7 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
 
     return res.status(200).json({
       status: 'success',
-      message: 'Login successfully'
+      message: 'Berhasil masuk'
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -60,7 +60,11 @@ export const addSession = async (req: Request, res: Response): Promise<Response>
         issues: error.issues
       })
     }
-    if (error instanceof PrismaError || error instanceof BadRequestError || error instanceof AuthError) {
+    if (
+      error instanceof PrismaError ||
+      error instanceof BadRequestError ||
+      error instanceof AuthError
+    ) {
       return res.status(400).json({
         status: 'fail',
         message: error.message
@@ -79,7 +83,7 @@ export const removeSession = async (req: Request, res: Response): Promise<Respon
 
   try {
     if (!user) {
-      throw new BadRequestError('Invalid request, You are not logged in.')
+      throw new BadRequestError('Permintaan tidak valid, kamu belum login.')
     }
 
     req.session.destroy((err: any) => {
@@ -90,7 +94,7 @@ export const removeSession = async (req: Request, res: Response): Promise<Respon
 
     return res.status(200).clearCookie('ticket.session').json({
       status: 'success',
-      message: 'Logged out successfully'
+      message: 'Berhasil keluar'
     })
   } catch (error: any) {
     if (error instanceof PrismaError || error instanceof BadRequestError) {

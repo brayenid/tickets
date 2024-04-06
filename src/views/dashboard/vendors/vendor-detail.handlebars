@@ -9,27 +9,27 @@
       <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
         <div>
           <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Name</label
+            >Nama</label
           >
           <input
             type="text"
             name="name"
             id="name"
-            placeholder="Type vendor name"
+            placeholder="Masukan nama vendor"
             required=""
             value="{{ vendor.name }}"
             disabled
           />
         </div>
         <div>
-          <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Email</label
           >
           <input
             type="email"
             name="email"
             id="email"
-            placeholder="Vendor email"
+            placeholder="Masukan alamat email vendor yang valid"
             required=""
             value="{{ vendor.email }}"
             disabled
@@ -37,14 +37,14 @@
         </div>
         <div>
           <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Phone</label
+            >No. Telepon</label
           >
           <input
             type="tel"
             name="phone"
             id="phone"
             class="input-styled"
-            placeholder="Vendor phone"
+            placeholder="Masukan nomor telepon vendor"
             required=""
             value="{{ vendor.phone }}"
             disabled
@@ -52,14 +52,14 @@
         </div>
         <div>
           <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Address</label
+            >Alamat</label
           >
           <input
             type="text"
             name="address"
             id="address"
             class="input-styled"
-            placeholder="Vendor address"
+            placeholder="Masukan alamat vendor"
             required=""
             value="{{ vendor.address }}"
             disabled
@@ -67,14 +67,14 @@
         </div>
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="birth"
-            >Established/Joined On
+            >Didirikan/Waktu Bergabung
           </label>
           <input
             type="date"
             name="birth"
             id="birth"
             class="input-styled"
-            placeholder="Vendor established/joined"
+            placeholder="Didirikan/waktu bergabung"
             required=""
             value="{{ vendor.birth }}"
             disabled
@@ -83,7 +83,7 @@
       </div>
       <div class="flex justify-end mt-4">
         <button type="submit" id="add-vendor-btn" class="cursor-not-allowed" disabled>
-          Update Vendor
+          Perbaharui
         </button>
       </div>
     </form>

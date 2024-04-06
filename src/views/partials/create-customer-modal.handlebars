@@ -5,7 +5,7 @@
     <div
       class="flex items-center justify-between p-4 md:p-5 border-b md:rounded-t dark:border-gray-600"
     >
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create New Customer</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tambahkan Pelanggan</h3>
       <button
         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
         data-modal-toggle="crud-modal"
@@ -28,63 +28,100 @@
         <span class="sr-only">Close modal</span>
       </button>
     </div>
+    <div class="p-4">
+      <div
+        class="flex items-center p-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800"
+        role="alert"
+      >
+        <svg
+          class="flex-shrink-0 inline w-4 h-4 me-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+          />
+        </svg>
+        <span class="sr-only">Info</span>
+        <div>
+          Sebaiknya pembuatan customer melalui
+          <a class="font-semibold" href="/register" target="_blank" rel="noopener noreferrer"
+            >form register</a
+          >, untuk memastikan email terverifikasi.
+        </div>
+      </div>
+    </div>
     <!-- Modal body -->
-    <form id="create-customer" class="p-4">
+    <form id="create-customer" class="p-4 pt-0">
       <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
         <div>
           <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Name</label
+            >Nama</label
           >
-          <input type="text" name="name" id="name" placeholder="Type customer name" required="" />
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Masukan nama pelanggan"
+            required=""
+          />
         </div>
         <div>
           <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Email</label
           >
-          <input type="email" name="email" id="email" placeholder="Customer email" required="" />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Masukan email pelanggan yang valid"
+            required=""
+          />
         </div>
         <div>
           <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Phone</label
+            >No. Telepon</label
           >
           <input
             type="tel"
             name="phone"
             id="phone"
             class="input-styled"
-            placeholder="Customer phone"
+            placeholder="Masukan nomor telepon pelanggan"
             required=""
           />
         </div>
         <div>
           <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Address</label
+            >Alamat</label
           >
           <input
             type="text"
             name="address"
             id="address"
             class="input-styled"
-            placeholder="Customer address"
+            placeholder="Alamat pelanggan"
             required=""
           />
         </div>
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="birth"
-            >Birth
+            >Tanggal Lahir
           </label>
           <input
             type="date"
             name="birth"
             id="birth"
             class="input-styled"
-            placeholder="Customer established/joined"
+            placeholder="Tanggal lahir"
             required=""
           />
         </div>
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="password"
-            >Temporary Password
+            >Password Sementara
           </label>
           <input
             type="password"
@@ -97,7 +134,7 @@
         </div>
       </div>
       <div class="flex justify-end mt-4">
-        <button type="submit" id="add-customer-btn">Add Customer</button>
+        <button type="submit" id="add-customer-btn">Tambah</button>
       </div>
     </form>
   </div>

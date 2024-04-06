@@ -28,7 +28,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
 
   try {
     if (!req.file) {
-      throw new BadRequestError('Thumbnail is required')
+      throw new BadRequestError('Thumbnail wajib diunggah')
     }
     if (!req.fileId) {
       throw new Error('Server error. ID_NOT_GENERATED')
@@ -63,7 +63,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
 
     return res.status(201).json({
       status: 'success',
-      message: 'Event created successfully'
+      message: 'Event berhasil dibuat'
     })
   } catch (error: any) {
     if (req.file) {
@@ -169,7 +169,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<Response
 
     return res.status(200).json({
       status: 'success',
-      message: 'Event updated successfully'
+      message: 'Event berhasil diubah'
     })
   } catch (error: any) {
     console.log(error)
@@ -220,7 +220,7 @@ export const deleteEvent = async (req: Request, res: Response): Promise<Response
     await fs.unlink(thumbnailPath)
     return res.status(200).json({
       status: 'success',
-      message: 'Event successfully deleted'
+      message: 'Event berhasil dihapus'
     })
   } catch (error: any) {
     if (error instanceof PrismaError || error instanceof BadRequestError) {

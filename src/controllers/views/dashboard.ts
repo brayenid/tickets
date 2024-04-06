@@ -6,6 +6,12 @@ import {
   getUsersByRoleTotalService
 } from '../../services/users'
 import { getEventPriceByEventIdService } from '../../services/event-prices'
+import {
+  getOrderByIdService,
+  getsOrdersService,
+  getsOrdersTotalService
+} from '../../services/orders'
+import { getTicketTotalService, getTicketsService } from '../../services/tickets'
 
 export const main = (req: Request, res: Response): void => {
   res.render('dashboard/main', {
@@ -310,9 +316,9 @@ export const createCustomer = async (req: Request, res: Response): Promise<void>
 export const customerDetailDashboard = async (req: Request, res: Response): Promise<void> => {
   const { userId } = req.params
 
-  const vendor = await getUserCompleteService(userId, 'vendor')
+  const customer = await getUserCompleteService(userId, 'customer')
 
-  if (!vendor.id) {
+  if (!customer.id) {
     res.status(404).render('errors/not-found', {
       title: 404,
       layout: 'plain'
@@ -322,19 +328,166 @@ export const customerDetailDashboard = async (req: Request, res: Response): Prom
 
   const paths = [
     {
-      label: 'Vendors',
-      url: '/dashboard/vendors'
+      label: 'Customers',
+      url: '/dashboard/customers'
     },
     {
-      label: `Vendor Detail : ${vendor.name}`,
-      url: `/dashboard/vendors/${userId}`
+      label: `Customer Detail : ${customer.name}`,
+      url: `/dashboard/customers/${userId}`
     }
   ]
 
-  res.render('dashboard/vendors/vendor-detail', {
-    title: `Event Detail - ${vendor.name}`,
+  res.render('dashboard/customers/customer-detail', {
+    title: `Event Detail - ${customer.name}`,
     layout: 'dashboard',
     paths,
-    vendor
+    customer
+  })
+}
+
+// ORDERS
+export const orderList = async (req: Request, res: Response): Promise<void> => {
+  const { search, page, status } = req.query
+
+  const limitPage = 9
+  const searchQuery = search ? String(search) : ''
+  const pageQuery = page ? Number(page) : 1
+  const statusQuery = status ? String(status) : ''
+  const prevPage = pageQuery - 1
+  const nextPage = pageQuery + 1
+
+  const paths = [
+    {
+      label: 'Orders',
+      url: '/dashboard/orders'
+    }
+  ]
+
+  const ordersTotal = await getsOrdersTotalService(searchQuery, statusQuery)
+
+  /* LOGIC STUF */
+  const isPrevPageMoreThanZero = (): boolean => {
+    if (prevPage > 0) {
+      return true
+    }
+
+    return false
+  }
+
+  const countTotalPage = (): number => {
+    if (ordersTotal < limitPage) {
+      return 1
+    }
+    const divideTotalToLimit = ordersTotal / limitPage
+    return Math.ceil(divideTotalToLimit)
+  }
+
+  const isTotalPagesMoreThanNextPage = (): boolean => {
+    if (nextPage <= countTotalPage()) {
+      return true
+    }
+    return false
+  }
+
+  const orders = await getsOrdersService(searchQuery, statusQuery, limitPage, pageQuery)
+
+  res.render('dashboard/orders/order-list', {
+    title: 'Order List',
+    paths,
+    layout: 'dashboard',
+    prevPage,
+    nextPage,
+    pageQuery,
+    totalPages: countTotalPage(),
+    orders,
+    isPrevPageMoreThanZero: isPrevPageMoreThanZero(),
+    isNotReachLastPage: isTotalPagesMoreThanNextPage(),
+    search: searchQuery
+  })
+}
+
+export const orderDetailDashboard = async (req: Request, res: Response): Promise<void> => {
+  const { orderId } = req.params
+  const order = await getOrderByIdService(orderId)
+
+  const paths = [
+    {
+      label: 'Daftar Order',
+      url: '/dashboard/orders'
+    },
+    {
+      label: 'Detail Order',
+      url: `/dashboard/orders/${orderId}`
+    }
+  ]
+
+  const isOrderSettled = !!(order.status === 'settlement' || order.status === 'capture')
+
+  res.render('dashboard/orders/order-detail', {
+    title: 'Detail Order',
+    layout: 'dashboard',
+    order,
+    paths,
+    isOrderSettled
+  })
+}
+
+// Tickets
+export const ticketList = async (req: Request, res: Response): Promise<void> => {
+  const { search, page } = req.query
+
+  const limitPage = 9
+  const searchQuery = search ? String(search) : ''
+  const pageQuery = page ? Number(page) : 1
+  const prevPage = pageQuery - 1
+  const nextPage = pageQuery + 1
+
+  const paths = [
+    {
+      label: 'Orders',
+      url: '/dashboard/orders'
+    }
+  ]
+
+  const ticketsTotal = await getTicketTotalService(searchQuery)
+
+  /* LOGIC STUF */
+  const isPrevPageMoreThanZero = (): boolean => {
+    if (prevPage > 0) {
+      return true
+    }
+
+    return false
+  }
+
+  const countTotalPage = (): number => {
+    if (ticketsTotal < limitPage) {
+      return 1
+    }
+    const divideTotalToLimit = ticketsTotal / limitPage
+    return Math.ceil(divideTotalToLimit)
+  }
+
+  const isTotalPagesMoreThanNextPage = (): boolean => {
+    if (nextPage <= countTotalPage()) {
+      return true
+    }
+    return false
+  }
+
+  const tickets = await getTicketsService(searchQuery, limitPage, pageQuery)
+
+  res.render('dashboard/tickets/ticket-list', {
+    title: 'Ticket List',
+    paths,
+    layout: 'dashboard',
+    prevPage,
+    nextPage,
+    pageQuery,
+    totalPages: countTotalPage(),
+    tickets,
+    isPrevPageMoreThanZero: isPrevPageMoreThanZero(),
+    isNotReachLastPage: isTotalPagesMoreThanNextPage(),
+    search: searchQuery
   })
 }

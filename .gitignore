@@ -4,6 +4,7 @@ node_modules
 prisma/migrations
 *.db
 public/uploads
+public/tickets
 bu
 error.log
 dist

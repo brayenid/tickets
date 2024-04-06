@@ -11,7 +11,7 @@ export const patchPassword = async (req: Request, res: Response): Promise<Respon
 
     return res.status(200).json({
       status: 'success',
-      message: 'Password updated successfully'
+      message: 'Password berhasil diubah'
     })
   } catch (error: any) {
     console.log(error)

@@ -31,7 +31,7 @@ const login = async () => {
     return
   }
 
-  toastSuccess('Login successfully')
+  toastSuccess(response.message)
   setTimeout(() => {
     window.location.replace('/')
   }, 1000)

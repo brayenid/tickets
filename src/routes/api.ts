@@ -37,7 +37,12 @@ import { addCustomer, updateCustomer } from '../controllers/customer-acc'
 import { limit } from '../utils/RateLimiter'
 import { addOfflineTransaction, addTransaction } from '../controllers/transactions'
 import { processTransactionNotif } from '../controllers/transactions/notification'
-import { getTicketsByCategory, getTicketsById, getTicketsByUserId } from '../controllers/tickets'
+import {
+  getTicketsByCategory,
+  getTicketsById,
+  getTicketsByUserId,
+  ticketToPdfDirect
+} from '../controllers/tickets'
 import {
   getOrderById,
   getOrdersByDay,
@@ -110,5 +115,6 @@ router.post('/notification/transaction', processTransactionNotif)
 router.get('/tickets/user', customerAuth.validate, getTicketsByUserId)
 router.get('/tickets/detail/:ticketId', customerAuthLoose.validate, getTicketsById)
 router.get('/statistic/tickets/:eventId/category', adminAuth.validate, getTicketsByCategory)
+router.get('/tickets/download/:ticketId/direct', customerAuthLoose.validate, ticketToPdfDirect)
 
 export default router

@@ -4,10 +4,10 @@
   >
     <span
       class="underline underline-offset-2 decoration-4 decoration-primary-400 dark:decoration-primary-600"
-      >Tickets :
+      >Ticket :
     </span>
   </h2>
-  <p class="w-full mb-4 text-center md:text-left">Set the ticket quantity (Max. 5)</p>
+  <p class="w-full mb-4 text-center md:text-left">Atur tiket yang ingin dibeli (Max. 5)</p>
   <div class="space-y-4">
     {{#if eventPrices.length}}
     {{#each eventPrices}}
@@ -29,7 +29,7 @@
       <p class="total">Total</p>
       <p>Rp. <span class="price font-semibold">0</span></p>
     </div>
-    <button class="w-full" type="button" onclick="checkout()">Checkout</button>
+    <button class="w-full" type="button" onclick="checkout()">Beli</button>
     {{else}}
     <p class="w-full p-2 border text-center flex gap-2 justify-center items-center rounded-lg">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" viewBox="0 0 24 24">
@@ -45,7 +45,7 @@
           opacity=".5"
         />
       </svg>
-      No ticket found!
+      Tiket akan datang!
     </p>
     {{/if}}
   </div>

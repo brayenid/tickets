@@ -3,7 +3,7 @@ const quill = new Quill('#editor', {
   modules: {
     toolbar: true
   },
-  placeholder: 'Write event decription...',
+  placeholder: 'Buat deskripsi ...',
   theme: 'snow'
 })
 
@@ -75,13 +75,14 @@ const updateEvent = async () => {
 
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Update Event',
+    title: 'Perbaharui Event',
     text: isWithFile
-      ? 'Are you sure to update the event and upload new thumbnail?'
-      : 'Are you sure to update the event?',
+      ? 'Apakah kamu yakin memperbaharui event sekaligus thumbnail baru?'
+      : 'Apakah kamu yakin memperbaharui event?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Update'
+    confirmButtonText: 'Perbaharui',
+    cancelButtonText: 'Batal'
   })
 
   if (isConfirmed) {
@@ -210,11 +211,12 @@ document.addEventListener('keydown', async (e) => {
 const deleteEvent = async (id) => {
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Delete Event',
-    text: 'Are you sure delete this event?',
+    title: 'Hapus Event',
+    text: 'Kamu yakin menghapus event ini?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Delete'
+    confirmButtonText: 'Hapus',
+    cancelButtonText: 'Batal'
   })
 
   if (isConfirmed) {
@@ -237,11 +239,12 @@ const deleteEvent = async (id) => {
 const deleteEventPrice = async (id) => {
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Delete Price',
-    text: 'Are you sure delete this price?',
+    title: 'Hapus Harga',
+    text: 'Kamu yakin menghapus harga ini?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Delete'
+    confirmButtonText: 'Hapus',
+    cancelButtonText: 'Batal'
   })
 
   if (isConfirmed) {

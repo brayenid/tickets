@@ -5,7 +5,7 @@
     <div
       class="flex items-center justify-between p-4 md:p-5 border-b md:rounded-t dark:border-gray-600"
     >
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create New Vendor</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tambahkan Vendor</h3>
       <button
         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
         data-modal-toggle="crud-modal"
@@ -33,58 +33,64 @@
       <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
         <div>
           <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Name</label
+            >Nama</label
           >
-          <input type="text" name="name" id="name" placeholder="Type vendor name" required="" />
+          <input type="text" name="name" id="name" placeholder="Masukan nama vendor" required="" />
         </div>
         <div>
-          <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Email</label
           >
-          <input type="email" name="email" id="email" placeholder="Vendor email" required="" />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Masukan alamat email yang valid"
+            required=""
+          />
         </div>
         <div>
           <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Phone</label
+            >No. Telepon</label
           >
           <input
             type="tel"
             name="phone"
             id="phone"
             class="input-styled"
-            placeholder="Vendor phone"
+            placeholder="Masukan nomor telepon vendor"
             required=""
           />
         </div>
         <div>
           <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >Address</label
+            >Alamat</label
           >
           <input
             type="text"
             name="address"
             id="address"
             class="input-styled"
-            placeholder="Vendor address"
+            placeholder="Masukan alamat vendor"
             required=""
           />
         </div>
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="birth"
-            >Established/Joined On
+            >Didirikan/Waktu Bergabung
           </label>
           <input
             type="date"
             name="birth"
             id="birth"
             class="input-styled"
-            placeholder="Vendor established/joined"
+            placeholder="Masukan waktu bergabung"
             required=""
           />
         </div>
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="password"
-            >Temporary Password
+            >Password Sementara
           </label>
           <input
             type="password"
@@ -97,7 +103,7 @@
         </div>
       </div>
       <div class="flex justify-end mt-4">
-        <button type="submit" id="add-vendor-btn">Add Vendor</button>
+        <button type="submit" id="add-vendor-btn">Tambah</button>
       </div>
     </form>
   </div>

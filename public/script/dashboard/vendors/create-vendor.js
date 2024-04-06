@@ -27,7 +27,7 @@ const addVendorLoading = (isLoading) => {
       `
     addVendorBtn.setAttribute('disabled', '')
   } else {
-    addVendorBtn.innerHTML = 'Add Vendor'
+    addVendorBtn.innerHTML = 'Tambah'
     addVendorBtn.removeAttribute('disabled')
   }
 }
@@ -52,11 +52,12 @@ const addVendor = async () => {
 
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Add New Vendor',
-    text: 'Are you sure to add new vendor?',
+    title: 'Tambahkan Vendor',
+    text: 'Kamu yakin menambah vendor baru?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Add'
+    confirmButtonText: 'Tambah',
+    cancelButtonText: 'Batal'
   })
   if (isConfirmed) {
     addVendorLoading(true)

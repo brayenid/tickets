@@ -5,13 +5,13 @@ import { AuthError } from '../../utils/Errors'
 export const tickets = (req: Request, res: Response): void => {
   const paths = [
     {
-      label: 'Ticket List',
+      label: 'Daftar Tiket',
       url: '/user/tickets'
     }
   ]
 
   res.render('tickets/tickets', {
-    title: 'Your Tickets',
+    title: 'Tiketmu',
     paths
   })
 }
@@ -22,11 +22,11 @@ export const ticketDetail = async (req: Request, res: Response): Promise<void> =
   const ticket = await getTicketByIdService(ticketId)
   const paths = [
     {
-      label: 'Ticket List',
+      label: 'Daftar Tiket',
       url: '/user/tickets'
     },
     {
-      label: `${ticket.event.name} Ticket`,
+      label: `Ticket ${ticket.event.name}`,
       url: `/user/tickets/${ticketId}`
     }
   ]

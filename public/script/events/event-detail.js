@@ -52,7 +52,7 @@ const checkout = async () => {
   })
 
   if (accumulateQty < 1) {
-    toastErr('You have to buy at least 1 ticket')
+    toastErr('Harus beli minimal 1 tiket')
     return
   }
 
@@ -60,11 +60,12 @@ const checkout = async () => {
 
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Checkout',
-    text: 'Are you sure to checkout the ticket(s)',
+    title: 'Selesaikan',
+    text: 'Yakin melakukan pembelian tiket?',
     showCancelButton: true,
     showConfirmButton: true,
-    confirmButtonText: 'Checkout',
+    confirmButtonText: 'Bayar',
+    cancelButtonText: 'Batal',
     padding: '1rem 0.7rem',
     customClass: {
       title: 'sw-title',

@@ -1,9 +1,9 @@
 <main id="ticket-detail" class="container" data-tx-id="{{ ticket.id }}">
   {{> breadcrumbs }}
-  <h2 class="styled-h2 !my-5 !text-center">Ticket Detail</h2>
+  <h2 class="styled-h2 !my-5 !text-center">Detail Tiket</h2>
   <div class="item">
     <div class="qr-container">
-      <div id="qrcode"></div>
+      <canvas id="qrcode"></canvas>
       <div
         class="flex items-center p-4 mt-2 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
         role="alert"
@@ -20,7 +20,7 @@
           />
         </svg>
         <span class="sr-only">Info</span>
-        <div>Scan before enter the gate</div>
+        <div>Pindai sebelum masuk gerbang.</div>
       </div>
     </div>
     <div class="detail flex-[2.4] rounded-lg space-y-4 overflow-x-auto">
@@ -53,16 +53,16 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Active
+              Keaktifan
             </th>
             <td class="px-6 py-4">: {{ ticket.isActive }}</td>
           </tr>
-          <tr class="bg-white border-b dark:bg-gray-800 dark:bg-gray-800">
+          <tr class="bg-white border-b dark:bg-gray-800">
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Category
+              Kategori
             </th>
             <td class="px-6 py-4">: {{ ticket.category }}</td>
           </tr>
@@ -71,7 +71,7 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Event Name
+              Nama Event
             </th>
             <td class="px-6 py-4">
               : <a class="styled" href="/events/{{ ticket.event.id }}">{{ ticket.event.name }}</a>
@@ -82,7 +82,7 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Event Date
+              Tanggal Event
             </th>
             <td class="px-6 py-4">: {{formatISODate ticket.event.date }}</td>
           </tr>
@@ -91,14 +91,35 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
             >
-              Event Location
+              Lokasi Event
             </th>
             <td class="px-6 py-4">: {{ ticket.event.location }}</td>
           </tr>
         </tbody>
       </table>
+      <div class="flex justify-end">
+        <button type="button" onclick="generateTicket()" id="download-btn">Unduh</button>
+      </div>
     </div>
   </div>
 </main>
-<script src="/script/packages/qrcode.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
+  integrity="sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"
+  integrity="sha512-pUhApVQtLbnpLtJn6DuzDD5o2xtmLJnJ7oBoMsBnzOkVkpqofGLGPaBJ6ayD2zQe3lCgCibhJBi4cj5wAxwVKA=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script src="https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit/dist/fontkit.umd.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"
+  integrity="sha512-WiGQZv8WpmQVRUFXZywo7pHIO0G/o3RyiAJZj8YXNN4AV7ReR1RYWVmZJ6y3H06blPcjJmG/sBpOVZjTSFFlzQ=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
 <script src="/script/tickets/ticket-detail.js"></script>
