@@ -4,9 +4,12 @@ import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 import {
   addEventPriceService,
   deleteEventPriceService,
-  getEventPriceByEventIdService
+  getEventPriceByEventIdService,
+  getEventPriceByIdService
 } from '../../services/event-prices'
 import { z } from 'zod'
+import { logger } from '../../utils/Logger'
+import { getTransactionByOrderIdService } from '../../services/transaction'
 
 export const addEventPrice = async (req: Request, res: Response): Promise<Response> => {
   const { name, price, eventId, stock, grade } = req.body
@@ -120,7 +123,59 @@ export const deleteEventPrice = async (req: Request, res: Response): Promise<Res
       })
     }
 
-    console.log(error.message)
+    logger.error(error.message)
+
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
+    })
+  }
+}
+
+export const evaluateEventPriceStock = async (req: Request, res: Response): Promise<Response> => {
+  const { orderId } = req.params
+
+  try {
+    const transactions = await getTransactionByOrderIdService(orderId)
+
+    for (const transaction of transactions) {
+      const eventPrice = await getEventPriceByIdService(transaction.eventPriceId ?? '')
+
+      if ((transaction.quantity ?? 0) > eventPrice.stock) {
+        throw new BadRequestError(
+          `Pembelian tiket ${eventPrice.name} melewati stok. Coba lagi atau belanja ulang`
+        )
+      }
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Oke'
+    })
+  } catch (error: any) {
+    if (error instanceof BadRequestError) {
+      // Throw 200 to avoid being printed on console
+      return res.status(200).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
 
     return res.status(500).json({
       status: 'fail',

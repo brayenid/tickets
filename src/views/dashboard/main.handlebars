@@ -1,1 +1,33 @@
-<main>hello</main>
+<main class="p-4">
+  <div class="p-2 mb-2">
+    <h2 class="text-xl font-bold text-gray-700 dark:text-white">Ikhtisar</h2>
+  </div>
+  <div id="dashboard-main">
+    <div class="item border-fuchsia-300">
+      <h2>Total Event</h2>
+      <span class="number">{{ eventsTotal }}</span>
+    </div>
+    <div class="item border-emerald-300">
+      <h2>Total Tiket Terjual</h2>
+      <span class="number">{{ ticketsTotal }}</span>
+    </div>
+    <div class="item border-cyan-300">
+      <h2>Total Pelanggan</h2>
+      <span class="number">{{ customersTotal }}</span>
+    </div>
+    <div class="item border-primary-300">
+      <h2>Total Vendor</h2>
+      <span class="number">{{ vendorsTotal }}</span>
+    </div>
+    <div class="item border-rose-300 col-span-2">
+      <div class="flex justify-between">
+        <div>
+          <h2>Tren Order</h2>
+        </div>
+      </div>
+      <div id="area-chart-orders"></div>
+    </div>
+  </div>
+</main>
+<script src="/script/packages/apexcharts.js"></script>
+<script src="/script/dashboard/main.js"></script>

@@ -81,10 +81,12 @@ export const getOrderById = async (req: Request, res: Response): Promise<Respons
 }
 
 export const getOrdersByEventIdSource = async (req: Request, res: Response): Promise<Response> => {
-  const { eventId } = req.params
+  const { eventId } = req.query
+
+  const eventIdQ = eventId ? String(eventId) : ''
 
   try {
-    const orders = await getOrdersByEventIdService(eventId)
+    const orders = await getOrdersByEventIdService(eventIdQ)
 
     const ordersBySourceMapped = orders.map((order) => {
       return {
@@ -113,11 +115,13 @@ export const getOrdersByEventIdSource = async (req: Request, res: Response): Pro
 }
 
 export const getOrdersByDay = async (req: Request, res: Response): Promise<Response> => {
-  const { eventId } = req.params
+  const { eventId } = req.query
+
+  const eventIdQ = eventId ? String(eventId) : ''
 
   try {
-    const orders = await getOrdersByDayService(eventId)
-    const transactionsAmount = await getTransactionsAmountTotalService(eventId)
+    const orders = await getOrdersByDayService(eventIdQ)
+    const transactionsAmount = await getTransactionsAmountTotalService(eventIdQ)
     const ordersByDayMapped = groupByDay(orders)
 
     const orderTotal = ordersByDayMapped.reduce((a, b) => {

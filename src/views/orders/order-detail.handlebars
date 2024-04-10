@@ -1,4 +1,9 @@
-<main id="order-detail" class="container" data-token="{{ order.paymentToken }}">
+<main
+  id="order-detail"
+  class="container"
+  data-token="{{ order.paymentToken }}"
+  data-order-id="{{ order.id }}"
+>
   {{> breadcrumbs }}
   <h2 class="styled-h2 !my-5 !text-center">Detail Order</h2>
   <div class="flex gap-4 items-start">
@@ -76,12 +81,17 @@
     </div>
   </div>
   {{#unless isOrderSettled}}
-  <div class="my-4 flex justify-end">
-    <button type="button" onclick="openPayment()" class="w-full md:w-max">Pay</button>
+  <div class="my-4 flex justify-end" id="payment-btn-container">
+    <button type="button" onclick="openPayment()" class="w-full md:w-max">Bayar</button>
   </div>
   {{/unless}}
   <div id="snap-container"></div>
 </main>
+<script
+  src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+  integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+  crossorigin="anonymous"
+></script>
 <script
   type="text/javascript"
   src="https://app.sandbox.midtrans.com/snap/snap.js"

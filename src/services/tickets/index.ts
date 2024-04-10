@@ -1,6 +1,6 @@
 import type { TicketOutput, TicketOutputSimple, TicketPayload } from '../../interfaces/Tickets'
 import { prisma } from '../../utils/Db'
-import { NotFoundError } from '../../utils/Errors'
+import { BadRequestError, NotFoundError } from '../../utils/Errors'
 
 export const addTicketService = async (transactions: TicketPayload[]): Promise<void> => {
   await prisma.$transaction(async (prismaClient) => {
@@ -275,4 +275,132 @@ export const getTicketTotalService = async (search: string = ''): Promise<number
   })
 
   return total._count.id
+}
+
+export const ticketActivationService = async (
+  ticketId: string,
+  eventId: string
+): Promise<string> => {
+  const ticket = await prisma.tickets.findFirst({
+    select: {
+      id: true,
+      isActive: true
+    },
+    where: {
+      AND: [
+        {
+          id: ticketId
+        },
+        {
+          transaction: {
+            order: {
+              eventId
+            }
+          }
+        }
+      ]
+    }
+  })
+
+  if (!ticket) {
+    throw new BadRequestError('Tiket tidak valid')
+  }
+
+  if (ticket.isActive) {
+    throw new BadRequestError('Tiket sudah diaktivasi')
+  }
+
+  const validatedTicket = await prisma.tickets.update({
+    select: {
+      id: true,
+      transaction: {
+        select: {
+          order: {
+            select: {
+              user: {
+                select: {
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    where: {
+      id: ticketId,
+      transaction: {
+        order: {
+          eventId
+        }
+      }
+    },
+    data: {
+      isActive: true,
+      updatedAt: new Date()
+    }
+  })
+
+  return validatedTicket.transaction.order?.user.name ?? ''
+}
+
+export const getActiveTicketsService = async (
+  eventId: string = '',
+  limit: number = 10
+): Promise<TicketOutput[]> => {
+  const tickets = await prisma.tickets.findMany({
+    include: {
+      transaction: {
+        select: {
+          category: true,
+          order: {
+            select: {
+              event: {
+                select: {
+                  id: true,
+                  name: true,
+                  date: true,
+                  thumbnail: true
+                }
+              },
+              user: {
+                select: {
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    where: {
+      transaction: {
+        order: {
+          eventId
+        }
+      },
+      isActive: true
+    },
+    take: limit,
+    orderBy: {
+      updatedAt: 'desc'
+    }
+  })
+
+  const formattedTickets = tickets.map((ticket) => ({
+    id: ticket.id ?? '',
+    transactionId: ticket.transactionId,
+    category: ticket.transaction.category,
+    isActive: ticket.isActive,
+    createdAt: ticket.createdAt,
+    updatedAt: ticket.updatedAt,
+    user: ticket.transaction.order?.user.name,
+    event: {
+      id: ticket.transaction.order?.event.id ?? '',
+      name: ticket.transaction.order?.event.name ?? '',
+      date: ticket.transaction.order?.event.date ?? '',
+      thumbnail: ticket.transaction.order?.event.thumbnail ?? ''
+    }
+  }))
+  return formattedTickets
 }

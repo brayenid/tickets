@@ -1,5 +1,5 @@
 export interface EventPricePayload {
-  id: string
+  id?: string
   name: string
   price: number
   eventId: string

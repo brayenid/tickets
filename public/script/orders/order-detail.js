@@ -1,10 +1,10 @@
 /* eslint-disable */
 const $ = (selector) => document.querySelector(selector)
 
-const paymentToken = $('#order-detail')
+const orderDetail = $('#order-detail')
 
-const openPayment = () => {
-  window.snap.pay(paymentToken.dataset.token, {
+const openPayment = async () => {
+  window.snap.pay(orderDetail.dataset.token, {
     onSuccess: function (result) {
       toastSuccess('Payment success!')
       setTimeout(() => {
@@ -12,16 +12,27 @@ const openPayment = () => {
       }, 500)
     },
     onPending: function (result) {
-      /* You may add your own implementation here */
       toastWarning('Waiting your payment!')
     },
     onError: function (result) {
-      /* You may add your own implementation here */
       toastErr('Payment failed!')
     },
     onClose: function () {
-      /* You may add your own implementation here */
       toastWarning('You closed the popup without finishing the payment')
-    }
+    },
+    selectedPaymentType: 'gci'
   })
 }
+const socket = io()
+
+socket.on(`${orderDetail.dataset.orderId}:message`, (msg) => {
+  if (msg.orderId === orderDetail.dataset.orderId) {
+    window.snap.hide()
+    toastErr(msg.message)
+    document.querySelector('#payment-btn-container').innerHTML = ''
+
+    setTimeout(() => {
+      window.location.reload()
+    }, 3000)
+  }
+})

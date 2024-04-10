@@ -17,28 +17,40 @@ changePasswordForm.addEventListener('submit', async (e) => {
 
   submitBtn.setAttribute('disabled', '')
 
-  const response = await fetch('/api/credential', {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      oldPassword,
-      newPassword
-    }),
-    method: 'PATCH'
+  const { isConfirmed } = await Swal.fire({
+    icon: 'question',
+    title: 'Ubah Password',
+    text: 'Yakin ingin merubah password?',
+    showCancelButton: true,
+    cancelButtonText: 'Batal',
+    confirmButtonText: 'Ubah'
   })
 
-  const responseJson = await response.json()
+  if (isConfirmed) {
+    const response = await fetch('/api/credential', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        oldPassword,
+        newPassword
+      }),
+      method: 'PATCH'
+    })
 
-  if (response.status !== 200) {
-    toastErr(responseJson.message)
-    submitBtn.removeAttribute('disabled')
+    const responseJson = await response.json()
 
-    return
+    if (response.status !== 200) {
+      toastErr(responseJson.message)
+      submitBtn.removeAttribute('disabled')
+
+      return
+    }
+
+    toastSuccess(responseJson.message)
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
-
-  toastSuccess(responseJson.message)
-  setTimeout(() => {
-    window.location.reload()
-  }, 1000)
+  submitBtn.removeAttribute('disabled')
 })

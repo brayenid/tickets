@@ -39,7 +39,8 @@ export const orderDetail = async (req: Request, res: Response): Promise<void> =>
     }
   ]
 
-  const isOrderSettled = !!(order.status === 'settlement' || order.status === 'capture')
+  const settlementIssues = ['settlement', 'capture', 'expire', 'cancel', 'deny']
+  const isOrderSettled = !!settlementIssues.includes(order.status)
 
   res.render('orders/order-detail', {
     title: 'Order Detail',

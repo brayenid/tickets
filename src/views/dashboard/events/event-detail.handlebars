@@ -1,4 +1,4 @@
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.4/dist/quill.snow.css" rel="stylesheet" />
+<link href="/style/packages/quill.snow.css" rel="stylesheet" />
 <main class="p-4 space-y-4">
   {{> breadcrumbs }}
 
@@ -31,9 +31,9 @@
           <select id="is-open" class="input-styled">
             {{#isSelected true event.isOpen}}
             <option value="1" selected>Buka</option>
-            <option value="0">Close</option>
+            <option value="0">Tutup</option>
             {{else}}
-            <option value="1">Open</option>
+            <option value="1">Buka</option>
             <option value="0" selected>Tutup</option>
             {{/isSelected}}
           </select>
@@ -223,5 +223,5 @@
     </div>
   </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.4/dist/quill.js"></script>
+<script src="/script/packages/quill.js"></script>
 <script src="/script/dashboard/events/event-detail.js"></script>

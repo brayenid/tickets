@@ -12,14 +12,16 @@ import {
   createSudoService,
   deleteUserService,
   getUserByIdService,
+  getUsersByRoleService,
   resetUserPasswordService,
   updateUserService
 } from '../../services/users'
 import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
+import { logger } from '../../utils/Logger'
 
 export const addUser = async (req: Request, res: Response): Promise<Response> => {
   const { name, email, password, role, address, birth, phone }: UserRequestBody = req.body
-  const id: string = nanoid(16)
+  const id: string = nanoid(24)
 
   try {
     const payloadSchema = z.object({
@@ -66,6 +68,7 @@ export const addUser = async (req: Request, res: Response): Promise<Response> =>
       })
     }
 
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: error.message
@@ -112,6 +115,7 @@ export const updateUser = async (req: Request, res: Response): Promise<Response>
       })
     }
 
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: error.message
@@ -141,6 +145,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
       })
     }
 
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: error.message
@@ -170,6 +175,7 @@ export const getUser = async (req: Request, res: Response): Promise<Response> =>
       })
     }
 
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: error.message
@@ -222,6 +228,43 @@ export const resetUserPassword = async (req: Request, res: Response): Promise<Re
     return res.status(200).json({
       status: 'success',
       message: 'Password berhasil diubah'
+    })
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Bad payload',
+        issues: error.issues
+      })
+    }
+
+    if (error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
+    })
+  }
+}
+
+export const getUsers = async (req: Request, res: Response): Promise<Response> => {
+  const { search, role } = req.query
+
+  const searchQ = search ? String(search) : ''
+  const roleQ = role ? String(role) : 'customer'
+
+  try {
+    const users = await getUsersByRoleService(searchQ, roleQ)
+
+    return res.status(200).json({
+      status: 'success',
+      data: users
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {

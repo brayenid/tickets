@@ -1,4 +1,4 @@
-import express, { type Express, type Request, type Response } from 'express'
+import express, { type Request, type Response } from 'express'
 import dotenv from 'dotenv'
 import apiRoutes from './routes/api'
 import viewsRoute from './routes/views'
@@ -15,9 +15,11 @@ import {
   moreThanZero,
   ifEqualNumber,
   isSelected,
-  formatISODate
+  formatISODate,
+  lessThanOne
 } from './utils/helpers/HbsHelpers'
 import { authStatus } from './middlewares/AuthStatus'
+import { app, server } from './utils/servers'
 
 declare module 'express-session' {
   interface SessionData {
@@ -33,7 +35,6 @@ declare module 'express-session' {
 
 dotenv.config()
 
-const app: Express = express()
 const port: number | string = process.env.PORT ?? 3000
 const limiter = limit(300)
 
@@ -68,7 +69,8 @@ const hbs = create({
     moreThanZero,
     ifEqualNumber,
     isSelected,
-    formatISODate
+    formatISODate,
+    lessThanOne
   }
 })
 
@@ -85,6 +87,6 @@ app.use((req: Request, res: Response) => {
   })
 })
 
-app.listen(port, (): void => {
+server.listen(port, (): void => {
   console.log(`Server is running on http://localhost:${port}`)
 })

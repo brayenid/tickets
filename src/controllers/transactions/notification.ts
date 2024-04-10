@@ -7,22 +7,30 @@ import { getTransactionByOrderIdService } from '../../services/transaction'
 import { addTicketService } from '../../services/tickets'
 import type { TicketPayload } from '../../interfaces/Tickets'
 import { generateId } from '../../utils/IDGenerator'
-import { operateEventPriceStocKService } from '../../services/event-prices'
+import {
+  getEventPriceByIdService,
+  operateEventPriceStocKService
+} from '../../services/event-prices'
 import type { Transaction } from '../../interfaces/Transaction'
 import { updateOrderStatusService } from '../../services/orders'
+import fetch from 'node-fetch'
+import { io } from '../../utils/servers'
 
 /**
  *
  * This will undo event price stock value
  */
-const operateStock = async (transactions: Transaction[]): Promise<void> => {
+const operateStock = async (
+  transactions: Transaction[],
+  operation: 'add' | 'min' = 'add'
+): Promise<void> => {
   // LOOP THROUGH EACH TRANSACTION OBJECT
   for (let i = 0; i < transactions.length; i++) {
     const { quantity, eventPriceId } = transactions[i]
 
-    // ANOTHER LOOP TO DO AN OPERATION
+    // ANOTHER LOOP TO DO AN ADD OPERATION BASED ON TRANSACTION/ORD ITEM QTY
     for (let j = 0; j < (quantity ?? 0); j++) {
-      await operateEventPriceStocKService(eventPriceId ?? '', 'add')
+      await operateEventPriceStocKService(eventPriceId ?? '', operation)
     }
   }
 }
@@ -52,6 +60,8 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
     const isFailed = ['deny', 'failure'].includes(transactionStatus as string)
     const isExpired = transactionStatus === 'expire'
     const isRefunded = transactionStatus === 'refund'
+    const isPending = transactionStatus === 'pending'
+    const isCancel = transactionStatus === 'cancel'
 
     if (isSettled) {
       await updateOrderStatusService({
@@ -105,6 +115,64 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
         id: orderId,
         source,
         status: 'refunded'
+      })
+    } else if (isPending) {
+      try {
+        const transactions = await getTransactionByOrderIdService(orderId as string)
+
+        for (const transaction of transactions) {
+          const eventPrice = await getEventPriceByIdService(transaction.eventPriceId ?? '')
+
+          if ((transaction.quantity ?? 0) > eventPrice.stock) {
+            io.emit(`${orderId}:message`, {
+              orderId,
+              message: `Maaf, pembelian tiket ${eventPrice.name} melewati stok. Coba lagi atau belanja ulang`
+            })
+            throw new BadRequestError(
+              `Pembelian tiket ${eventPrice.name} melewati stok. Coba lagi atau belanja ulang`
+            )
+          }
+        }
+
+        await updateOrderStatusService({
+          id: orderId,
+          source,
+          status: 'pending'
+        })
+        await operateStock(transactions, 'min')
+      } catch (error: any) {
+        const serverKey = btoa(config.midtrans.options.serverKey)
+        const url = `https://api.sandbox.midtrans.com/v2/${orderId}/cancel`
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              authorization: `Basic ${serverKey}`
+            }
+          })
+
+          const responseJson = await response.json()
+
+          return res.status(200).json({
+            status: 'success',
+            message: responseJson
+          })
+        } catch (error: any) {
+          logger.error(error)
+
+          return res.status(200).json({
+            status: 'success',
+            message: error
+          })
+        }
+      }
+    } else if (isCancel) {
+      await updateOrderStatusService({
+        id: orderId,
+        source,
+        status: 'cancel'
       })
     }
 

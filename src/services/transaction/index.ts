@@ -90,17 +90,6 @@ export const addTransactionService = async (
             category: item.category
           }
         })
-
-        await prismaClient.eventPrices.update({
-          data: {
-            stock: {
-              decrement: item.quantity
-            }
-          },
-          where: {
-            id: item.eventPriceId
-          }
-        })
       }
 
       const { token, redirect_url: redirectUrl } = await midtrans.createTransaction(midtransPayload)

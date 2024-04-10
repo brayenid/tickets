@@ -4,6 +4,7 @@ import {
   createSudo,
   deleteUser,
   getUser,
+  getUsers,
   resetUserPassword,
   updateUser
 } from '../controllers/users'
@@ -27,6 +28,7 @@ import {
 import {
   addEventPrice,
   deleteEventPrice,
+  evaluateEventPriceStock,
   getEventPriceByEventId
 } from '../controllers/event-prices'
 import {
@@ -38,9 +40,11 @@ import { limit } from '../utils/RateLimiter'
 import { addOfflineTransaction, addTransaction } from '../controllers/transactions'
 import { processTransactionNotif } from '../controllers/transactions/notification'
 import {
+  getActiveTickets,
   getTicketsByCategory,
   getTicketsById,
   getTicketsByUserId,
+  ticketActivation,
   ticketToPdfDirect
 } from '../controllers/tickets'
 import {
@@ -70,6 +74,7 @@ router.get('/users/detail', getUser)
 router.patch('/credential', auth.validateSession, patchPassword)
 router.patch('/credential/reset', adminAuth.validate, resetUserPassword)
 router.get('/sudo/create', createSudo)
+router.get('/users', adminAuth.validate, getUsers)
 
 /* AUTH */
 router.post('/auth', limitLogin, addSession)
@@ -87,6 +92,7 @@ router.post('/register/verification/token', verifyEmailActivation)
 router.post('/event-price', adminAuth.validate, addEventPrice)
 router.get('/event-price/:eventId', getEventPriceByEventId)
 router.delete('/event-price/:eventPriceId', deleteEventPrice)
+router.get('/evaluate/event-price/:orderId', evaluateEventPriceStock)
 
 /* EVENTS */
 router.post('/events', adminAuth.validate, eventThumbnailMiddleware, addEvent)
@@ -101,8 +107,8 @@ router.get('/statistic/events/attenders/:eventId/gender', getEventAttendersGende
 /* ORDERS */
 router.get('/orders/detail', customerAuth.validate, getOrdersByUserId)
 router.get('/orders/detail/:orderId', customerAuthLoose.validate, getOrderById)
-router.get('/statistic/orders/:eventId/source', adminAuth.validate, getOrdersByEventIdSource)
-router.get('/statistic/orders/:eventId/date', adminAuth.validate, getOrdersByDay)
+router.get('/statistic/orders/source', adminAuth.validate, getOrdersByEventIdSource)
+router.get('/statistic/orders/date', adminAuth.validate, getOrdersByDay)
 
 /* TRANSACTIONS */
 router.post('/transaction', customerAuth.validate, addTransaction)
@@ -116,5 +122,7 @@ router.get('/tickets/user', customerAuth.validate, getTicketsByUserId)
 router.get('/tickets/detail/:ticketId', customerAuthLoose.validate, getTicketsById)
 router.get('/statistic/tickets/:eventId/category', adminAuth.validate, getTicketsByCategory)
 router.get('/tickets/download/:ticketId/direct', customerAuthLoose.validate, ticketToPdfDirect)
+router.post('/tickets/activation', adminAuth.validate, ticketActivation)
+router.get('/tickets/active', adminAuth.validate, getActiveTickets)
 
 export default router

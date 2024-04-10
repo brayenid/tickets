@@ -5,11 +5,13 @@ import fontkit from '@pdf-lib/fontkit'
 import QRcode from 'qrcode'
 import { formatISODate } from './helpers/HbsHelpers'
 import type { TicketOutput } from '../interfaces/Tickets'
+import { logger } from './Logger'
 
 export const generateTicketDirectRes = async (
   ticketDetail: TicketOutput
 ): Promise<Buffer | undefined> => {
   try {
+    // Create QR based on ticket id
     const qr = await QRcode.toDataURL(ticketDetail.id)
 
     // Fetch Fonts
@@ -22,7 +24,6 @@ export const generateTicketDirectRes = async (
 
     // Load existed pdf as ticket base
     const existingPdfBytes = await readFileToBuffer(path.resolve(__dirname, 'assets', 'base.pdf'))
-
     const pdfDoc = await PDFDocument.load(existingPdfBytes)
     pdfDoc.registerFontkit(fontkit)
 
@@ -94,19 +95,23 @@ export const generateTicketDirectRes = async (
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const qrImage = await pdfDoc.embedPng(qr)
 
-    // Menggambar gambar QR di tengah halaman
+    // Set QR Position
     const qrX = 500
     const qrY = 60
     const qrImageWidth = 90
     const qrImageHeight = 90
     page.drawImage(qrImage, { x: qrX, y: qrY, width: qrImageWidth, height: qrImageHeight })
 
+    /**
+     * pdfBytes return an Uint8Array data, not compatible and cannot be return as
+     * a response to the client, thus it has to be converted into Buffer.
+     */
     const pdfBytes = await pdfDoc.save()
     const pdfBuffer = Buffer.from(pdfBytes.buffer)
 
     return pdfBuffer
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    logger.error(error.message)
   }
 }
 
@@ -153,6 +158,12 @@ interface MultiText {
   page: any
 }
 
+/**
+ * To make a multiple line text that printed on the canvas
+ * because it will not automatically wrap into a new line
+ * the strategy is simple, just split the long text into array of strings
+ * using splitText(), and then make a loop and print it
+ */
 const printMultipleText = ({
   longText,
   fontSize,

@@ -1,13 +1,16 @@
 import type { Request, Response } from 'express'
 import {
+  getActiveTicketsService,
   getTicketByIdService,
   getTicketsByCategoryService,
-  getTicketsByUserIdService
+  getTicketsByUserIdService,
+  ticketActivationService
 } from '../../services/tickets'
 import { AuthError, BadRequestError, NotFoundError } from '../../utils/Errors'
 import { logger } from '../../utils/Logger'
 import { groupByTixCatFreq } from '../../utils/helpers/GroupByTicketCat'
 import { generateTicketDirectRes } from '../../utils/TicketPDFGenerator'
+import { z } from 'zod'
 
 export const getTicketsByUserId = async (req: Request, res: Response): Promise<Response> => {
   const session = req.session.user
@@ -20,7 +23,7 @@ export const getTicketsByUserId = async (req: Request, res: Response): Promise<R
       throw new BadRequestError('Invalid session')
     }
     const tickets = await getTicketsByUserIdService(
-      session?.id,
+      String(session?.id),
       search as string,
       pageLimit,
       pageNumber
@@ -139,7 +142,89 @@ export const ticketToPdfDirect = async (
       .set('Content-Disposition', `attachment; filename="${fileName}"`)
       .send(ticketBuffer)
   } catch (error) {
-    console.error(error)
+    if (error instanceof AuthError) {
+      return res.status(401).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
+    })
+  }
+}
+
+export const ticketActivation = async (req: Request, res: Response): Promise<Response> => {
+  const { eventId, ticketId } = req.body
+
+  const payloadSchema = z.object({
+    eventId: z.string(),
+    ticketId: z.string()
+  })
+
+  try {
+    payloadSchema.parse({
+      eventId,
+      ticketId
+    })
+
+    await ticketActivationService(ticketId as string, eventId as string)
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Tiket aktif'
+    })
+  } catch (error: any) {
+    if (error instanceof NotFoundError || error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+    if (error instanceof AuthError) {
+      return res.status(401).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
+    })
+  }
+}
+
+export const getActiveTickets = async (req: Request, res: Response): Promise<Response> => {
+  const { eventId } = req.query
+
+  try {
+    if (!eventId) {
+      throw new BadRequestError('Sertakan event ID')
+    }
+    const tickets = await getActiveTicketsService(eventId as string, 10)
+
+    return res.status(200).json({
+      status: 'success',
+      data: tickets
+    })
+  } catch (error: any) {
+    if (error instanceof NotFoundError || error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+    if (error instanceof AuthError) {
+      return res.status(401).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: 'Server error'

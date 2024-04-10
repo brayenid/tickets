@@ -13,7 +13,7 @@ import {
   getOrderByIdService,
   updateOrderService
 } from '../../services/orders'
-import { getEventByIdService, getEventStatusService } from '../../services/events'
+import { getEventByIdService } from '../../services/events'
 import { addTicketService } from '../../services/tickets'
 import { getUserByIdService } from '../../services/users'
 
@@ -25,9 +25,15 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
   const fee = config.transaction.fee
 
   try {
-    const getEventStatus = await getEventStatusService(eventId as string)
-    if (!getEventStatus.isOpen) {
+    const eventInfo = await getEventByIdService(eventId as string)
+    if (!eventInfo.isOpen) {
       throw new BadRequestError('Event tidak dibuka untuk dijual')
+    }
+    const currentDate = new Date()
+    const eventDate = new Date(eventInfo.date)
+
+    if (currentDate >= eventDate) {
+      throw new BadRequestError('Masa penyelenggaraan event sudah lewat')
     }
 
     const orderSchema = z.object({
@@ -68,8 +74,16 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
         if (!item.eventPriceId) {
           throw new Error('ID could not be empty')
         }
-        const { name, price } = await getEventPriceByIdService(item.eventPriceId)
+        const { name, price, stock } = await getEventPriceByIdService(item.eventPriceId)
         const { name: eventName } = await getEventByIdService(eventId as string)
+
+        if (stock < 1) {
+          throw new BadRequestError(`Tiket ${name} habis, ulangi pembelian`)
+        }
+
+        if (item.quantity > stock) {
+          throw new BadRequestError(`Pembelian tiket ${name} melebihi stok (${stock})`)
+        }
 
         return {
           id: generateId('TID'),
@@ -151,9 +165,15 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
   const id = generateId('OID')
 
   try {
-    const getEventStatus = await getEventStatusService(eventId as string)
-    if (!getEventStatus.isOpen) {
-      throw new BadRequestError('Event is not on sale')
+    const eventInfo = await getEventByIdService(eventId as string)
+    if (!eventInfo.isOpen) {
+      throw new BadRequestError('Event tidak dibuka untuk dijual')
+    }
+    const currentDate = new Date()
+    const eventDate = new Date(eventInfo.date)
+
+    if (currentDate >= eventDate) {
+      throw new BadRequestError('Masa penyelenggaraan event sudah lewat')
     }
 
     const orderSchema = z.object({
@@ -194,8 +214,16 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
         if (!item.eventPriceId) {
           throw new Error('ID could not be empty')
         }
-        const { name, price } = await getEventPriceByIdService(item.eventPriceId)
+        const { name, price, stock } = await getEventPriceByIdService(item.eventPriceId)
         const { name: eventName } = await getEventByIdService(eventId as string)
+
+        if (stock < 1) {
+          throw new BadRequestError(`Tiket ${name} habis`)
+        }
+
+        if (item.quantity > stock) {
+          throw new BadRequestError(`Kuantitas ${name} melebihi stok (${stock})`)
+        }
 
         return {
           id: generateId('TID'),
@@ -233,7 +261,7 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
 
     return res.status(201).json({
       status: 'success',
-      message: `Offline tansaction for ${name} created successfully`
+      message: `Pembelian untuk ${name} berhasil dibuat, silahkan cek tiket`
     })
   } catch (error: any) {
     /*

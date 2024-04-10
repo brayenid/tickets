@@ -1,0 +1,93 @@
+<main class="p-4 space-y-4">
+  {{> breadcrumbs }}
+
+  {{!-- Edit Event --}}
+  <section class="bg-white p-6 shadow-sm rounded-lg" id="detail">
+    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Detail : {{ admin.name }}</h2>
+    {{!-- Keep create vendor id to avoid repetitive css --}}
+    <form id="create-vendor" class="p-4">
+      <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
+        <div>
+          <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Name</label
+          >
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Type vendor name"
+            required=""
+            value="{{ admin.name }}"
+            disabled
+          />
+        </div>
+        <div>
+          <label for="location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Email</label
+          >
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Vendor email"
+            required=""
+            value="{{ admin.email }}"
+            disabled
+          />
+        </div>
+        <div>
+          <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Phone</label
+          >
+          <input
+            type="tel"
+            name="phone"
+            id="phone"
+            class="input-styled"
+            placeholder="Vendor phone"
+            required=""
+            value="{{ admin.phone }}"
+            disabled
+          />
+        </div>
+        <div>
+          <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Address</label
+          >
+          <input
+            type="text"
+            name="address"
+            id="address"
+            class="input-styled"
+            placeholder="Vendor address"
+            required=""
+            value="{{ admin.address }}"
+            disabled
+          />
+        </div>
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="birth"
+            >Established/Joined On
+          </label>
+          <input
+            type="date"
+            name="birth"
+            id="birth"
+            class="input-styled"
+            placeholder="Vendor established/joined"
+            required=""
+            value="{{ admin.birth }}"
+            disabled
+          />
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button type="submit" id="add-vendor-btn" class="cursor-not-allowed" disabled>
+          Update Admin
+        </button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<script src="/script/dashboard/events/event-detail.js"></script>

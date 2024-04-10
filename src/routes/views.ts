@@ -7,6 +7,8 @@ import { Auth } from '../middlewares/Auth'
 import { ticketDetail, tickets } from '../controllers/views/tickets'
 import { patchPassword } from '../controllers/views/credentials'
 import {
+  adminDetailDashboard,
+  createAdmin,
   createCustomer,
   createEvent,
   createVendors,
@@ -14,8 +16,12 @@ import {
   eventDetailDashboard,
   eventSummaryDashboard,
   main,
+  offlineSale,
   orderDetailDashboard,
   orderList,
+  resetPassword,
+  ticketActivation,
+  ticketDetailDashboard,
   ticketList,
   vendorDetailDashboard
 } from '../controllers/views/dashboard'
@@ -24,6 +30,7 @@ const router: Router = Router()
 const customerAuth = new Auth('customer', [], 'view')
 const customerAuthLoose = new Auth('customer', ['admin', 'sudo'], 'view')
 const adminAuth = new Auth('admin', ['sudo'], 'view')
+const sudoAuth = new Auth('sudo', [], 'view')
 
 router.get('/login', loginPage)
 router.get('/register', registerPage)
@@ -51,5 +58,12 @@ router.get('/dashboard/customers/:userId', adminAuth.validate, customerDetailDas
 router.get('/dashboard/orders', adminAuth.validate, orderList)
 router.get('/dashboard/orders/:orderId', adminAuth.validate, orderDetailDashboard)
 router.get('/dashboard/tickets', adminAuth.validate, ticketList)
+router.get('/dashboard/tickets/:ticketId', adminAuth.validate, ticketDetailDashboard)
+router.get('/dashboard/ticket-activation', adminAuth.validate, ticketActivation)
+router.get('/dashboard/offline-sale', adminAuth.validate, offlineSale)
+
+router.get('/sudo/admins', sudoAuth.validate, createAdmin)
+router.get('/sudo/admins/:userId', sudoAuth.validate, adminDetailDashboard)
+router.get('/sudo/credential', sudoAuth.validate, resetPassword)
 
 export default router

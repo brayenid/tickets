@@ -95,3 +95,11 @@ export const isSelected = (value: any, selectedValue: any, block: any): any => {
   }
   return block.inverse(this)
 }
+
+export const lessThanOne = (input: number | string, block: any): any => {
+  if (Number(input) < 1) {
+    return block.fn(this)
+  } else {
+    return block.inverse(this)
+  }
+}

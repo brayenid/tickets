@@ -91,7 +91,7 @@ model Orders {
   id           String       @id
   paymentToken String       @default("0")
   redirectUrl  String       @default("0")
-  status       String       @default("pending")
+  status       String       @default("waiting")
   source       String       @default("0")
   event        Events       @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId      String

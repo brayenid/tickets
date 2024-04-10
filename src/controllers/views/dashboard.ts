@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import { getEventByIdService, getEventsService, getEventsTotalService } from '../../services/events'
 import {
+  getUserByIdService,
   getUserCompleteService,
   getUsersByRoleService,
   getUsersByRoleTotalService
@@ -8,15 +9,30 @@ import {
 import { getEventPriceByEventIdService } from '../../services/event-prices'
 import {
   getOrderByIdService,
+  getOrdersTotalAmountService,
   getsOrdersService,
   getsOrdersTotalService
 } from '../../services/orders'
-import { getTicketTotalService, getTicketsService } from '../../services/tickets'
+import {
+  getTicketByIdService,
+  getTicketTotalService,
+  getTicketsService
+} from '../../services/tickets'
+import type { EventPricePayload } from '../../interfaces/EventPrice'
 
-export const main = (req: Request, res: Response): void => {
+export const main = async (req: Request, res: Response): Promise<void> => {
+  const eventsTotal = await getEventsTotalService()
+  const ticketsTotal = await getTicketTotalService()
+  const customersTotal = await getUsersByRoleTotalService('', 'customer')
+  const vendorsTotal = await getUsersByRoleTotalService('', 'vendor')
+
   res.render('dashboard/main', {
     title: 'Dashboard',
-    layout: 'dashboard'
+    layout: 'dashboard',
+    eventsTotal,
+    ticketsTotal,
+    customersTotal,
+    vendorsTotal
   })
 }
 
@@ -98,6 +114,8 @@ export const eventSummaryDashboard = async (req: Request, res: Response): Promis
 
   const vendors = await getUsersByRoleService('', 'vendor')
   const eventPrices = await getEventPriceByEventIdService(eventId)
+  const eventsTotalCash = await getOrdersTotalAmountService(eventId)
+  const eventsTotalOfflineCash = await getOrdersTotalAmountService(eventId, 'offline')
 
   const paths = [
     {
@@ -116,7 +134,9 @@ export const eventSummaryDashboard = async (req: Request, res: Response): Promis
     layout: 'dashboard',
     paths,
     vendors,
-    eventPrices
+    eventPrices,
+    eventsTotalCash,
+    eventsTotalOfflineCash
   })
 }
 
@@ -489,5 +509,211 @@ export const ticketList = async (req: Request, res: Response): Promise<void> => 
     isPrevPageMoreThanZero: isPrevPageMoreThanZero(),
     isNotReachLastPage: isTotalPagesMoreThanNextPage(),
     search: searchQuery
+  })
+}
+
+export const ticketDetailDashboard = async (req: Request, res: Response): Promise<void> => {
+  const { ticketId } = req.params
+  try {
+    const ticket = await getTicketByIdService(ticketId)
+    const { name: userName } = await getUserByIdService(ticket.userId ?? '')
+    const paths = [
+      {
+        label: 'Daftar Tiket',
+        url: '/dashboard/tickets'
+      },
+      {
+        label: `Ticket ${ticket.event.name}`,
+        url: `/dashboard/tickets/${ticketId}`
+      }
+    ]
+
+    res.render('dashboard/tickets/ticket-detail', {
+      title: `${ticket.event.name} Ticket`,
+      paths,
+      ticket,
+      layout: 'dashboard',
+      userName
+    })
+  } catch (error: any) {
+    res.status(404).render('errors/not-found', {
+      title: 404,
+      layout: 'plain'
+    })
+  }
+}
+
+export const ticketActivation = (req: Request, res: Response): void => {
+  const paths = [
+    {
+      label: 'Aktivasi Tiket',
+      url: '/dashboard/ticket-activation'
+    }
+  ]
+
+  res.render('dashboard/tickets/ticket-activation', {
+    title: 'Aktivasi Tiket',
+    layout: 'dashboard',
+    paths
+  })
+}
+
+// OFFLINE SALE
+export const offlineSale = async (req: Request, res: Response): Promise<void> => {
+  const events = await getEventsService()
+  const customer = await getUsersByRoleService('', 'user')
+
+  const { eventId, userId } = req.query
+  const eventIdQuery = eventId ? String(eventId) : ''
+  const userIdQuery = userId ? String(userId) : ''
+
+  let isUserValid: boolean = false
+  let isEventValid: boolean = false
+  let eventPrices: EventPricePayload[] = []
+
+  if (eventId && userId) {
+    const event = await getEventByIdService(eventIdQuery)
+    eventPrices = await getEventPriceByEventIdService(eventIdQuery)
+
+    if (event.id) {
+      isEventValid = true
+    } else {
+      isEventValid = false
+    }
+
+    try {
+      await getUserByIdService(userIdQuery)
+      isUserValid = true
+    } catch (error) {
+      isUserValid = false
+    }
+  }
+
+  const paths = [
+    {
+      label: 'Pembelian Offline',
+      url: '/dashboard/offline-sale'
+    }
+  ]
+
+  res.render('dashboard/offline-sale/offline-sale', {
+    title: 'Pembelian Offline',
+    layout: 'dashboard',
+    paths,
+    events,
+    customer,
+    eventIdQuery,
+    userIdQuery,
+    isUserValid,
+    isEventValid,
+    isBasicInputValid: isEventValid && isUserValid,
+    eventPrices
+  })
+}
+
+// SUDO AREA
+export const createAdmin = async (req: Request, res: Response): Promise<void> => {
+  const { search, page } = req.query
+
+  const limitPage = 9
+  const searchQuery = search ? String(search) : ''
+  const pageQuery = page ? Number(page) : 1
+  const prevPage = pageQuery - 1
+  const nextPage = pageQuery + 1
+
+  const paths = [
+    {
+      label: 'Admins',
+      url: '/sudo/admins'
+    }
+  ]
+
+  const adminsTotal = await getUsersByRoleTotalService(searchQuery, 'admin')
+
+  /* LOGIC STUF */
+  const isPrevPageMoreThanZero = (): boolean => {
+    if (prevPage > 0) {
+      return true
+    }
+
+    return false
+  }
+
+  const countTotalPage = (): number => {
+    if (adminsTotal < limitPage) {
+      return 1
+    }
+    const divideTotalToLimit = adminsTotal / limitPage
+    return Math.ceil(divideTotalToLimit)
+  }
+
+  const isTotalPagesMoreThanNextPage = (): boolean => {
+    if (nextPage <= countTotalPage()) {
+      return true
+    }
+    return false
+  }
+
+  const admins = await getUsersByRoleService(searchQuery, 'admin', limitPage, pageQuery)
+
+  res.render('dashboard/admins/create-admin', {
+    title: 'Create Admin',
+    paths,
+    layout: 'dashboard',
+    prevPage,
+    nextPage,
+    pageQuery,
+    totalPages: countTotalPage(),
+    admins,
+    isPrevPageMoreThanZero: isPrevPageMoreThanZero(),
+    isNotReachLastPage: isTotalPagesMoreThanNextPage(),
+    search: searchQuery
+  })
+}
+
+export const adminDetailDashboard = async (req: Request, res: Response): Promise<void> => {
+  const { userId } = req.params
+
+  const admin = await getUserCompleteService(userId, 'admin')
+
+  if (!admin.id) {
+    res.status(404).render('errors/not-found', {
+      title: 404,
+      layout: 'plain'
+    })
+    return
+  }
+
+  const paths = [
+    {
+      label: 'Admins',
+      url: '/sudo/admins'
+    },
+    {
+      label: `Admin Detail : ${admin.name}`,
+      url: `/sudo/admins/${userId}`
+    }
+  ]
+
+  res.render('dashboard/admins/admin-detail', {
+    title: `Event Detail - ${admin.name}`,
+    layout: 'dashboard',
+    paths,
+    admin
+  })
+}
+
+export const resetPassword = (req: Request, res: Response): void => {
+  const paths = [
+    {
+      label: 'Reset Password',
+      url: '/sudo/credential'
+    }
+  ]
+
+  res.render('dashboard/reset-password/reset-password', {
+    title: 'Reset Password',
+    paths,
+    layout: 'dashboard'
   })
 }

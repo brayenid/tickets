@@ -1,7 +1,16 @@
 {{!-- Compatible with event-detail view --}}
+{{#lessThanOne ./stock}}
+<div class="sr-only">
+  <input type="text" id="qty-input-{{ ../id }}" value="0" disabled />
+</div>
+<p class="p-2 uppercase border rounded-lg text-red-500 border-red-500 text-xs bg-red-50">
+  Sold Out
+</p>
+{{else}}
+{{!-- counter --}}
 <div class="relative flex items-center max-w-[8rem]">
   <button
-    data-input="{{ id }}"
+    data-input="{{ ../id }}"
     data-btn="dec"
     class="qty-operation-btn !rounded-none !rounded-l-lg"
   >
@@ -23,7 +32,7 @@
   </button>
   <input
     type="text"
-    id="qty-input-{{ id }}"
+    id="qty-input-{{ ../id }}"
     inputmode="numeric"
     maxlength="2"
     min="1"
@@ -33,7 +42,7 @@
     disabled
   />
   <button
-    data-input="{{ id }}"
+    data-input="{{ ../id }}"
     data-btn="inc"
     class="qty-operation-btn !rounded-none !rounded-r-lg"
   >
@@ -54,3 +63,5 @@
     </svg>
   </button>
 </div>
+
+{{/lessThanOne}}

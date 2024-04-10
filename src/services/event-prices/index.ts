@@ -10,7 +10,7 @@ export const addEventPriceService = async (payload: EventPricePayload): Promise<
 
     await prisma.eventPrices.create({
       data: {
-        id,
+        id: String(id),
         name,
         price,
         eventId,
@@ -124,4 +124,24 @@ export const operateEventPriceStocKService = async (
       }
     })
   }
+}
+
+export const updateEventPriceService = async (
+  eventPriceId: string,
+  payload: EventPricePayload
+): Promise<void> => {
+  const { name, price, stock, grade } = payload
+
+  await prisma.eventPrices.update({
+    data: {
+      name,
+      price,
+      grade,
+      stock,
+      updatedAt: new Date()
+    },
+    where: {
+      id: eventPriceId
+    }
+  })
 }

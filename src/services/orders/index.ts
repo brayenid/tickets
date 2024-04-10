@@ -13,7 +13,7 @@ export const addOrderService = async (payload: OrderPayload): Promise<void> => {
           eventId: String(eventId),
           userId: String(userId),
           source: String(source),
-          status: status ?? 'pending'
+          status: status ?? 'waiting'
         }
       })
     })
@@ -337,6 +337,27 @@ export const getOrdersByEventIdService = async (eventId: string): Promise<OrderO
 }
 
 export const getOrdersByDayService = async (eventId: string): Promise<OrderOutput[]> => {
+  const whereQuery: any = {
+    AND: [
+      {
+        OR: [
+          {
+            status: 'settlement'
+          },
+          {
+            status: 'capture'
+          }
+        ]
+      }
+    ]
+  }
+
+  if (eventId) {
+    whereQuery.AND.push({
+      eventId
+    })
+  }
+
   const orders = await prisma.orders.findMany({
     select: {
       id: true,
@@ -350,23 +371,7 @@ export const getOrdersByDayService = async (eventId: string): Promise<OrderOutpu
         }
       }
     },
-    where: {
-      AND: [
-        {
-          eventId
-        },
-        {
-          OR: [
-            {
-              status: 'settlement'
-            },
-            {
-              status: 'capture'
-            }
-          ]
-        }
-      ]
-    },
+    where: whereQuery,
     orderBy: {
       updatedAt: 'asc'
     }
@@ -383,4 +388,58 @@ export const getOrdersByDayService = async (eventId: string): Promise<OrderOutpu
   })
 
   return ordersMapped
+}
+
+export const getOrdersTotalAmountService = async (
+  eventId: string = '',
+  source: string = ''
+): Promise<number> => {
+  const whereQuery: any = {
+    AND: [
+      {
+        OR: [
+          {
+            order: {
+              status: 'settlement'
+            }
+          },
+          {
+            order: {
+              status: 'capture'
+            }
+          }
+        ]
+      }
+    ]
+  }
+
+  if (eventId) {
+    whereQuery.AND.push({
+      order: {
+        eventId
+      }
+    })
+  }
+
+  if (source) {
+    whereQuery.AND.push({
+      order: {
+        source
+      }
+    })
+  }
+
+  const transactions = await prisma.orderItems.findMany({
+    select: {
+      amount: true,
+      quantity: true
+    },
+    where: whereQuery
+  })
+
+  const totalAmount = transactions.reduce((total, transaction) => {
+    return total + transaction.amount * transaction.quantity
+  }, 0)
+
+  return totalAmount
 }

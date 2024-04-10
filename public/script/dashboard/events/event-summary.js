@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // PIE ORDERS SOURCE
   const ordersBySource = (
     await (
-      await fetch(`/api/statistic/orders/${eventId}/source`, {
+      await fetch(`/api/statistic/orders/source?eventId=${eventId}`, {
         method: 'GET'
       })
     ).json()
@@ -230,14 +230,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // AREA ORDERS - Also set current cash el
   const orderTotalEl = document.querySelector('#order-total')
-  const currentCashEl = document.querySelector('#current-cash')
   const ordersByDate = await (
-    await fetch(`/api/statistic/orders/${eventId}/date`, {
+    await fetch(`/api/statistic/orders/date?eventId=${eventId}`, {
       method: 'GET'
     })
   ).json()
 
-  currentCashEl.innerHTML = addCurrencySeparator(ordersByDate.meta.amount)
   orderTotalEl.innerHTML = ordersByDate.meta.total
 
   const date = ordersByDate.data.map((ord) => {

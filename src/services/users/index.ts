@@ -199,9 +199,18 @@ export const getUsersByRoleService = async (
           role
         },
         {
-          name: {
-            contains: search
-          }
+          OR: [
+            {
+              id: {
+                contains: search
+              }
+            },
+            {
+              name: {
+                contains: search
+              }
+            }
+          ]
         }
       ]
     },

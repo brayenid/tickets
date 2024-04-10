@@ -32,8 +32,8 @@ export const addEventService = async (payload: EventPayload): Promise<void> => {
 
 export const getEventsService = async (
   search: string = '',
-  limit: number,
-  pageNumber: number
+  limit: number = 9,
+  pageNumber: number = 1
 ): Promise<EventPayload[]> => {
   const offset = (pageNumber - 1) * limit
 
@@ -63,6 +63,11 @@ export const getEventsService = async (
     },
     where: {
       OR: [
+        {
+          id: {
+            contains: search
+          }
+        },
         {
           name: {
             contains: search
