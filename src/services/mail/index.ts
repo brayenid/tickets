@@ -2,6 +2,7 @@ import type { Mail } from '../../interfaces/Mail'
 import nodemailer, { type SendMailOptions } from 'nodemailer'
 import fs from 'fs/promises'
 import Mustache from 'mustache'
+import { config } from '../../utils/Config'
 
 export const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
@@ -18,7 +19,7 @@ export const sendEmailService = async (payload: Mail): Promise<string> => {
   try {
     const template = await fs.readFile('src/utils/templates/mail-verification.html', 'utf-8')
     const mailConfig: SendMailOptions = {
-      from: '"No-reply Kita Tiket" <no-reply@kitatiket.com>',
+      from: `"No-reply Kita Tiket" <${config.mail.address}>`,
       to: target,
       subject,
       html: Mustache.render(template, { message, msgBody, msgHeader })

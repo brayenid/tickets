@@ -5,6 +5,9 @@ export const config = {
   transaction: {
     fee: 5000
   },
+  mail: {
+    address: process.env.MAIL_ADD
+  },
   midtrans: {
     options: {
       clientKey: process.env.CLIENT_KEY ?? '',
