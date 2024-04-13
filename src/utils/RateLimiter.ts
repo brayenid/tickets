@@ -13,10 +13,10 @@ export const limit = (request: number): RateLimitRequestHandler => {
     limit: request, // Limit each IP to 100 requests per `window` (here, per 1 minutes).
     standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-    validate: {
-      trustProxy: config.env === 'dev'
-      // xForwardedForHeader: config.env !== 'dev'
-    },
+    // validate: {
+    //   // trustProxy: config.env === 'dev'
+    //   // xForwardedForHeader: config.env !== 'dev'
+    // },
     handler: (req: Request, res: Response): Response => {
       return res.status(429).json({
         status: 'fail',
