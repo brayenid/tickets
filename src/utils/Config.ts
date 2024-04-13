@@ -1,3 +1,5 @@
+console.log(process.env.NODE_ENV?.trimEnd() !== 'dev')
+
 export const config = {
   env: process.env.NODE_ENV?.trimEnd(),
   host: process.env.HOST,
