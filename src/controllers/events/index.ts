@@ -100,6 +100,8 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
 export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
   const { date, description, location, name, vendorId, isOpen } = req.body
   const uploadedThumbnail = getUrlPath(req?.file, 8, 9)
+  console.log({ uploadedThumbnail })
+
   const { eventId: id } = req.params
 
   try {
