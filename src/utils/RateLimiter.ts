@@ -1,5 +1,4 @@
 import rateLimit, { type RateLimitRequestHandler } from 'express-rate-limit'
-import { config } from './Config'
 import type { Request, Response } from 'express'
 
 /**
