@@ -9,6 +9,8 @@ export const getUrlPath = (
     return 'NO_FULLPATH' // Atau tindakan lain sesuai kebutuhan Anda ketika req.file adalah undefined
   }
 
+  console.log({ fullPath })
+
   if (config.env === 'dev') {
     return fullPath.path.split('\\').splice(start, end).join('/')
   } else {
