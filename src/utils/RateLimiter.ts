@@ -14,8 +14,8 @@ export const limit = (request: number): RateLimitRequestHandler => {
     standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
     validate: {
-      trustProxy: config.env === 'dev',
-      xForwardedForHeader: config.env !== 'dev'
+      trustProxy: config.env === 'dev'
+      // xForwardedForHeader: config.env !== 'dev'
     },
     handler: (req: Request, res: Response): Response => {
       return res.status(429).json({
