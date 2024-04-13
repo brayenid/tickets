@@ -2,7 +2,8 @@ export interface EventPricePayload {
   id?: string
   name: string
   price: number
-  eventId: string
+  eventId?: string
   stock: number
   grade: number
+  vendorId?: string
 }

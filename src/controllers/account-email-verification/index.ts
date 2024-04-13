@@ -26,7 +26,9 @@ export const addEmailVerification = async (req: Request, res: Response): Promise
     await setKeyService({ email, key })
     await sendEmailService({
       target: email as string,
-      subject: 'Email verification',
+      subject: 'Kita Loket - Verifikasi Email',
+      msgHeader: 'Token Registrasi',
+      msgBody: 'Terima kasih telah mendaftar, berikut token registrasi anda',
       message: key
     })
 

@@ -25,6 +25,8 @@ class SuggestionBox {
       const targetElement = e.target
       if (!targetElement.closest(this.inputElementRaw) && this.data.length > 0) {
         this.suggestionBoxToggleVisibility()
+        this.showSuggestionBox = false
+        this.resetDataAndEl()
       }
     })
   }
@@ -48,6 +50,7 @@ class SuggestionBox {
       this.resetDataAndEl()
     }
     this.suggestionBoxToggleVisibility()
+    this.resetDataAndEl()
   }
 
   /**
@@ -100,20 +103,38 @@ class SuggestionBox {
     this.resetDataAndEl()
   }
 
+  debounce(func, delay) {
+    let timeoutId
+    return function () {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        func()
+      }, delay)
+    }
+  }
+
   // Will make a fetch to apiGet URL and create children element in suggestion box
   async getData(e) {
-    if (!this.apiGet) {
-      throw new Error('NO_APIGET_URL')
+    // Definisikan fungsi debounce di dalam getData
+    if (this.inputElement.value) {
+      const debounceFunc = this.debounce(async () => {
+        if (!this.apiGet) {
+          throw new Error('NO_APIGET_URL')
+        }
+
+        const searchQ = e.target.value || ''
+        const response = await fetch(`${this.apiGet}?search=${searchQ}`, {
+          method: 'GET'
+        })
+        const responseJson = await response.json()
+        this.data = responseJson.data
+
+        this.createSuggestionBoxChildren()
+      }, 800) // Penundaan adalah 300 milidetik (atau 0,3 detik)
+
+      // Panggil fungsi debounce setiap kali metode getData dipanggil
+      debounceFunc()
     }
-
-    const searchQ = e.target.value || ''
-    const response = await fetch(`${this.apiGet}?search=${searchQ}`, {
-      method: 'GET'
-    })
-    const responseJson = await response.json()
-    this.data = responseJson.data
-
-    this.createSuggestionBoxChildren()
   }
 
   // Create suggestion box children

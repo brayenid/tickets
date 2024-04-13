@@ -155,6 +155,23 @@ export const resetUserPasswordService = async (id: string, password: string): Pr
   })
 }
 
+export const resetUserPasswordByEmailService = async (
+  email: string,
+  password: string
+): Promise<void> => {
+  const currentTime = new Date()
+
+  await prisma.users.update({
+    data: {
+      password,
+      updatedAt: currentTime
+    },
+    where: {
+      email
+    }
+  })
+}
+
 export const getUserCompleteService = async (id: string, role: string): Promise<Users> => {
   const user = await prisma.users.findUnique({
     select: {

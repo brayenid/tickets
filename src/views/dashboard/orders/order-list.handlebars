@@ -41,7 +41,8 @@
               </tr>
             </thead>
             <tbody>
-              {{#each orders}}
+              {{#moreThanZero orders.length}}
+              {{#each ../orders}}
               <tr class="border-b dark:border-gray-700">
                 <td class="px-4 py-3">{{ id }}</td>
                 <td class="px-4 py-3">{{ status }}</td>
@@ -52,11 +53,16 @@
                 </td>
               </tr>
               {{/each}}
+              {{else}}
+              <tr class="border-b dark:border-gray-700">
+                <td class="px-4 py-3 text-center" colspan="5">No Data!</td>
+              </tr>
+              {{/moreThanZero}}
             </tbody>
           </table>
         </div>
         {{!-- PAGINATION --}}
-        {{> create-customer-pagination }}
+        {{> create-orders-pagination }}
       </div>
     </div>
   </section>

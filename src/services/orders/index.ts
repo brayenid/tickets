@@ -50,7 +50,8 @@ export const getOrderByIdService = async (id: string): Promise<OrderOutput> => {
           amount: true,
           quantity: true,
           createdAt: true,
-          updatedAt: true
+          updatedAt: true,
+          category: true
         }
       }
     },
@@ -442,4 +443,137 @@ export const getOrdersTotalAmountService = async (
   }, 0)
 
   return totalAmount
+}
+
+// VENDOR SIDE
+export const getsOrdersVendorService = async (
+  search: string = '',
+  status: string = '',
+  limit: number,
+  pageNumber: number,
+  vendorId: string
+): Promise<OrderOutput[]> => {
+  const offset = (pageNumber - 1) * limit
+
+  // Objek kriteria pencarian awal tanpa status
+  let whereCriteria: any = {
+    OR: [
+      {
+        id: {
+          contains: search
+        }
+      },
+      {
+        user: {
+          name: search
+        }
+      },
+      {
+        event: {
+          name: search
+        }
+      }
+    ],
+    event: {
+      vendorId
+    }
+  }
+
+  // Menambahkan status ke kriteria pencarian jika status tidak falsy
+  if (status) {
+    whereCriteria = {
+      ...whereCriteria,
+      status
+    }
+  }
+
+  const orders = await prisma.orders.findMany({
+    select: {
+      id: true,
+      status: true,
+      source: true,
+      updatedAt: true,
+      event: {
+        select: {
+          name: true,
+          thumbnail: true
+        }
+      },
+      OrderItems: {
+        select: {
+          id: true,
+          amount: true,
+          quantity: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      }
+    },
+    orderBy: {
+      updatedAt: 'desc'
+    },
+    where: whereCriteria, // Menggunakan kriteria pencarian yang telah dibuat
+    take: limit,
+    skip: offset
+  })
+
+  const ordersMapped = orders.map((order) => {
+    return {
+      id: order.id,
+      status: order.status,
+      source: order.source,
+      eventName: order.event.name,
+      eventThumbnail: order.event.thumbnail,
+      items: order.OrderItems,
+      updatedAt: order.updatedAt
+    }
+  })
+
+  return ordersMapped
+}
+
+export const getsOrdersTotalVendorService = async (
+  search: string = '',
+  status: string = '',
+  vendorId: string
+): Promise<number> => {
+  let whereCriteria: any = {
+    OR: [
+      {
+        id: {
+          contains: search
+        }
+      },
+      {
+        user: {
+          name: search
+        }
+      },
+      {
+        event: {
+          name: search
+        }
+      }
+    ],
+    event: {
+      vendorId
+    }
+  }
+
+  // Menambahkan status ke kriteria pencarian jika status tidak falsy
+  if (status) {
+    whereCriteria = {
+      ...whereCriteria,
+      status
+    }
+  }
+
+  const orders = await prisma.orders.aggregate({
+    _count: {
+      id: true
+    },
+    where: whereCriteria
+  })
+
+  return orders._count.id
 }

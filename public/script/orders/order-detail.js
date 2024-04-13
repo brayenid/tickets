@@ -1,7 +1,7 @@
 /* eslint-disable */
 const $ = (selector) => document.querySelector(selector)
-
 const orderDetail = $('#order-detail')
+const orderId = orderDetail.dataset.orderId
 
 const openPayment = async () => {
   window.snap.pay(orderDetail.dataset.token, {
@@ -16,17 +16,43 @@ const openPayment = async () => {
     },
     onError: function (result) {
       toastErr('Payment failed!')
-    },
-    onClose: function () {
-      toastWarning('You closed the popup without finishing the payment')
-    },
-    selectedPaymentType: 'gci'
+    }
   })
 }
-const socket = io()
 
-socket.on(`${orderDetail.dataset.orderId}:message`, (msg) => {
-  if (msg.orderId === orderDetail.dataset.orderId) {
+const cancelPayment = async () => {
+  const { isConfirmed } = await Swal.fire({
+    icon: 'question',
+    title: 'Batalkan Pesanan',
+    text: 'Yakin membatalkan pesanan ini?',
+    showCancelButton: true,
+    cancelButtonText: 'Tutup',
+    confirmButtonText: 'Batalkan'
+  })
+
+  if (isConfirmed) {
+    const response = await fetch(`/api/order/cancel/${orderId}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+    const responseJson = await response.json()
+    if (response.status !== 200) {
+      toastErr(responseJson.message)
+      return
+    }
+
+    toastSuccess(responseJson.message)
+    setTimeout(() => {
+      window.location.reload()
+    }, 1500)
+  }
+}
+
+const socket = io()
+socket.on(`${orderId}:message`, (msg) => {
+  if (msg.orderId === orderId) {
     window.snap.hide()
     toastErr(msg.message)
     document.querySelector('#payment-btn-container').innerHTML = ''

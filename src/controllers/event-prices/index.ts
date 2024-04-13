@@ -1,19 +1,22 @@
 import type { Request, Response } from 'express'
 import { nanoid } from 'nanoid'
-import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
+import { AuthError, BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 import {
   addEventPriceService,
   deleteEventPriceService,
   getEventPriceByEventIdService,
-  getEventPriceByIdService
+  getEventPriceByIdService,
+  updateEventPriceService
 } from '../../services/event-prices'
 import { z } from 'zod'
 import { logger } from '../../utils/Logger'
 import { getTransactionByOrderIdService } from '../../services/transaction'
+import { getEventByIdService } from '../../services/events'
 
 export const addEventPrice = async (req: Request, res: Response): Promise<Response> => {
   const { name, price, eventId, stock, grade } = req.body
   const id = nanoid(16)
+  const session = req.session.user
 
   try {
     const payloadSchema = z.object({
@@ -25,6 +28,13 @@ export const addEventPrice = async (req: Request, res: Response): Promise<Respon
     })
 
     payloadSchema.parse({ name, price, eventId, stock, grade })
+
+    const event = await getEventByIdService(eventId as string)
+    const accessList = ['admin', 'sudo']
+
+    if (session?.id !== event.vendorId && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses pada sumber daya ini')
+    }
 
     await addEventPriceService({ id, name, price, eventId, stock, grade })
 
@@ -48,6 +58,13 @@ export const addEventPrice = async (req: Request, res: Response): Promise<Respon
       })
     }
 
+    if (error instanceof AuthError) {
+      return res.status(403).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
     if (error instanceof NotFoundError) {
       return res.status(404).json({
         status: 'fail',
@@ -55,7 +72,7 @@ export const addEventPrice = async (req: Request, res: Response): Promise<Respon
       })
     }
 
-    console.log(error.message)
+    logger.error(error.message)
 
     return res.status(500).json({
       status: 'fail',
@@ -100,8 +117,16 @@ export const getEventPriceByEventId = async (req: Request, res: Response): Promi
 
 export const deleteEventPrice = async (req: Request, res: Response): Promise<Response> => {
   const { eventPriceId } = req.params
+  const session = req.session.user
 
   try {
+    const { vendorId: eventOwner } = await getEventPriceByIdService(eventPriceId)
+
+    const accessList = ['admin', 'sudo']
+
+    if (session?.id !== eventOwner && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
+    }
     await deleteEventPriceService(eventPriceId)
 
     return res.status(200).json({
@@ -180,6 +205,88 @@ export const evaluateEventPriceStock = async (req: Request, res: Response): Prom
     return res.status(500).json({
       status: 'fail',
       message: error.message
+    })
+  }
+}
+
+export const updateEventPrice = async (req: Request, res: Response): Promise<Response> => {
+  const { name, price, grade, stock } = req.body
+  const { eventPriceId } = req.params
+  const session = req.session.user
+
+  try {
+    const payloadSchema = z.object({
+      name: z.string(),
+      price: z.number(),
+      grade: z.number(),
+      stock: z.number()
+    })
+
+    const { id, vendorId } = await getEventPriceByIdService(eventPriceId)
+
+    if (!id) {
+      throw new BadRequestError('Invalid request')
+    }
+
+    const accessList = ['admin', 'sudo']
+
+    if (session?.id !== vendorId && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses pada sumber daya ini')
+    }
+
+    payloadSchema.parse({
+      name,
+      price,
+      grade,
+      stock
+    })
+
+    await updateEventPriceService(eventPriceId, {
+      name,
+      price,
+      grade,
+      stock
+    })
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Kategori harga berhasil diperbaharui'
+    })
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Bad payload',
+        issues: error.issues
+      })
+    }
+
+    if (error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof AuthError) {
+      return res.status(403).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
+
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
     })
   }
 }

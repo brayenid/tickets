@@ -4,7 +4,7 @@ export interface EventBasic {
   vendorId?: string
   location: string
   date: string
-  description: string
+  description?: string
   thumbnail?: string
   lowestPrice?: number
 }

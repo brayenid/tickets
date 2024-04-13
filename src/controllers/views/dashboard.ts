@@ -6,7 +6,10 @@ import {
   getUsersByRoleService,
   getUsersByRoleTotalService
 } from '../../services/users'
-import { getEventPriceByEventIdService } from '../../services/event-prices'
+import {
+  getEventPriceByEventIdService,
+  getEventPriceByIdService
+} from '../../services/event-prices'
 import {
   getOrderByIdService,
   getOrdersTotalAmountService,
@@ -19,6 +22,8 @@ import {
   getTicketsService
 } from '../../services/tickets'
 import type { EventPricePayload } from '../../interfaces/EventPrice'
+import { PrismaError } from '../../utils/Errors'
+import { getOfflineSaleCapabilityService } from '../../services/account-atribute'
 
 export const main = async (req: Request, res: Response): Promise<void> => {
   const eventsTotal = await getEventsTotalService()
@@ -37,7 +42,6 @@ export const main = async (req: Request, res: Response): Promise<void> => {
 }
 
 // EVENTS
-
 export const createEvent = async (req: Request, res: Response): Promise<void> => {
   const { search, page } = req.query
 
@@ -181,6 +185,52 @@ export const eventDetailDashboard = async (req: Request, res: Response): Promise
   })
 }
 
+export const eventPriceDetail = async (req: Request, res: Response): Promise<void> => {
+  const { eventPriceId, eventId } = req.params
+
+  try {
+    const { name, price, stock, grade } = await getEventPriceByIdService(eventPriceId)
+    const { name: eventName } = await getEventByIdService(eventId)
+
+    const paths = [
+      {
+        label: 'Events',
+        url: '/dashboard/events'
+      },
+      {
+        label: eventName,
+        url: `/dashboard/events/${eventId}`
+      },
+      {
+        label: 'Detail',
+        url: `/dashboard/events/${eventId}/detail`
+      },
+      {
+        label: 'Detail Kategori Harga',
+        url: `/dashboard/events/${eventId}/event-price/${eventPriceId}`
+      }
+    ]
+
+    res.render('dashboard/events/event-price-detail', {
+      title: 'Detail Kategori Harga',
+      paths,
+      layout: 'dashboard',
+      name,
+      price,
+      stock,
+      grade,
+      eventPriceId
+    })
+  } catch (error: any) {
+    if (error instanceof PrismaError) {
+      res.status(404).render('errors/not-found', {
+        title: 404,
+        layout: 'plain'
+      })
+    }
+  }
+}
+
 // VENDORS
 export const createVendors = async (req: Request, res: Response): Promise<void> => {
   const { search, page } = req.query
@@ -245,6 +295,7 @@ export const vendorDetailDashboard = async (req: Request, res: Response): Promis
   const { userId } = req.params
 
   const vendor = await getUserCompleteService(userId, 'vendor')
+  const offlineSaleCapability = await getOfflineSaleCapabilityService(userId)
 
   if (!vendor.id) {
     res.status(404).render('errors/not-found', {
@@ -269,7 +320,8 @@ export const vendorDetailDashboard = async (req: Request, res: Response): Promis
     title: `Event Detail - ${vendor.name}`,
     layout: 'dashboard',
     paths,
-    vendor
+    vendor,
+    offlineSaleCapability
   })
 }
 

@@ -7,33 +7,11 @@ import { getTransactionByOrderIdService } from '../../services/transaction'
 import { addTicketService } from '../../services/tickets'
 import type { TicketPayload } from '../../interfaces/Tickets'
 import { generateId } from '../../utils/IDGenerator'
-import {
-  getEventPriceByIdService,
-  operateEventPriceStocKService
-} from '../../services/event-prices'
-import type { Transaction } from '../../interfaces/Transaction'
+import { getEventPriceByIdService } from '../../services/event-prices'
 import { updateOrderStatusService } from '../../services/orders'
 import fetch from 'node-fetch'
 import { io } from '../../utils/servers'
-
-/**
- *
- * This will undo event price stock value
- */
-const operateStock = async (
-  transactions: Transaction[],
-  operation: 'add' | 'min' = 'add'
-): Promise<void> => {
-  // LOOP THROUGH EACH TRANSACTION OBJECT
-  for (let i = 0; i < transactions.length; i++) {
-    const { quantity, eventPriceId } = transactions[i]
-
-    // ANOTHER LOOP TO DO AN ADD OPERATION BASED ON TRANSACTION/ORD ITEM QTY
-    for (let j = 0; j < (quantity ?? 0); j++) {
-      await operateEventPriceStocKService(eventPriceId ?? '', operation)
-    }
-  }
-}
+import { operateStock } from '../../utils/helpers/OperateStockEventPrice'
 
 export const processTransactionNotif = async (req: Request, res: Response): Promise<Response> => {
   const {

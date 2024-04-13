@@ -1,0 +1,74 @@
+<main class="p-4" data-event-id="{{ event.id }}" id="summary">
+  {{> breadcrumbs }}
+  <div class="w-full p-2 mb-2 flex justify-between items-center">
+    <h2 class="text-xl font-bold text-gray-700 dark:text-white">Ikhtisar</h2>
+    <a title="Edit Event" href="/vendor/dashboard/events/{{ event.id }}/detail" class="link-styled"
+      ><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5v-2H5V8h14v1h2V5a2 2 0 0 0-2-2m2.7 10.35l-1 1l-2.05-2l1-1c.2-.21.54-.22.77 0l1.28 1.28c.19.2.19.52 0 .72M12 18.94l6.07-6.06l2.05 2L14.06 21H12z"
+        /></svg
+    ></a>
+  </div>
+  <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 min-h-[20vh]">
+    {{!-- AREA ORDERS --}}
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+      <div class="flex justify-between">
+        <div>
+          <h5
+            class="leading-none text-3xl font-bold text-gray-700 dark:text-white pb-2"
+            id="order-total"
+          >
+            0
+          </h5>
+          <p class="text-base font-normal text-gray-500 dark:text-gray-400">Total Order</p>
+        </div>
+      </div>
+      <div id="area-chart-orders"></div>
+    </div>
+    {{!-- PIE ORDERS SOURCE--}}
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+      <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
+        Order <span class="font-normal">(sumber)</span>
+      </h5>
+      <div class="py-6" id="pie-chart-orders-source"></div>
+    </div>
+    {{!-- PIE TX --}}
+    <div class="6 bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+      <div class="flex justify-between mb-3">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
+          Tiket <span class="font-normal">(kategori)</span>
+        </h5>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="py-6" id="donut-chart-tickets"></div>
+    </div>
+    {{!-- PIE GENDER --}}
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+      <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
+        Pelanggan <span class="font-normal">(gender)</span>
+      </h5>
+      <div class="py-6" id="pie-chart-attenders-gender"></div>
+    </div>
+    {{!-- PIE AGE --}}
+    <div class="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+      <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">
+        Pelanggan <span class="font-normal"> (usia)</span>
+      </h5>
+      <div class="py-6" id="pie-chart-attenders-age"></div>
+    </div>
+    {{!-- CURRENT CASH --}}
+    <div
+      class="border-b-4 border-primary-400 bg-white rounded-lg shadow dark:bg-gray-800 p-6 flex items-center justify-center flex-col gap-2"
+    >
+      <h5 class="text-2xl text-primary-500">Kas Total</h5>
+      <p class="text-2xl font-bold text-primary-700">
+        IDR. {{addCurrencySeparator eventsTotalCash }}
+      </p>
+      <p class="text-gray-500">Offline : IDR. {{addCurrencySeparator eventsTotalOfflineCash }}</p>
+    </div>
+  </div>
+</main>
+<script src="/script/packages/apexcharts.js"></script>
+<script src="/script/dashboard/events/event-summary.js" defer></script>

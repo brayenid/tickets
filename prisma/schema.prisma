@@ -11,21 +11,25 @@ datasource db {
 }
 
 model Users {
-  id        String   @id
-  name      String
-  email     String   @unique
-  phone     String   @default("0")
-  password  String
-  address   String   @default("0")
-  role      String   @default("admin")
-  birth     String   @default("1970-01-01")
-  avatar    String   @default("null")
-  isActive  Boolean  @default(false)
-  gender    String   @default("Unknown")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  Orders    Orders[]
-  Events    Events[]
+  id                String              @id
+  name              String
+  email             String              @unique
+  phone             String              @default("0")
+  password          String
+  address           String              @default("0")
+  role              String              @default("admin")
+  birth             String              @default("1970-01-01")
+  avatar            String              @default("null")
+  isActive          Boolean             @default(false)
+  gender            String              @default("Unknown")
+  instagram         String              @default("null")
+  twitter           String              @default("null")
+  facebook          String              @default("null")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now())
+  Orders            Orders[]
+  Events            Events[]
+  AccountAttributes AccountAttributes[]
 }
 
 model Session {
@@ -100,4 +104,11 @@ model Orders {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now())
   OrderItems   OrderItems[]
+}
+
+model AccountAttributes {
+  id          Int     @id @default(autoincrement())
+  offlineSale Boolean
+  Vendors     Users   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId    String  @unique
 }

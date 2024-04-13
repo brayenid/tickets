@@ -208,8 +208,41 @@
             <td class="px-4 py-3">{{addCurrencySeparator price }}</td>
             <td class="px-4 py-3">{{ stock }}</td>
             <td class="px-4 py-3">{{ grade }}</td>
-            <td class="px-4 py-3 text-center">
-              <button onclick="deleteEventPrice('{{ id }}')">Hapus</button>
+            <td class="px-4 py-3">
+              <div class="flex gap-2 justify-end">
+                <a
+                  href="/dashboard/events/{{ ../../event.id}}/event-price/{{ id }}"
+                  class="link-styled !p-2"
+                  title="Edit"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-white"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="m227.32 73.37l-44.69-44.68a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69l83.67-83.66l3.48 13.9l-36.8 36.79a8 8 0 0 0 11.31 11.32l40-40a8 8 0 0 0 2.11-7.6l-6.9-27.61L227.32 96a16 16 0 0 0 0-22.63M192 108.69L147.32 64l24-24L216 84.69Z"
+                    />
+                  </svg>
+                </a>
+                <button
+                  class="red !p-2 !text-xs"
+                  onclick="deleteEventPrice('{{ id }}')"
+                  title="Hapus"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-white"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M112 168a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm48 0a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm0-120H96v-8a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8Z"
+                    />
+                  </svg>
+                </button>
+              </div>
             </td>
           </tr>
           {{/each}}

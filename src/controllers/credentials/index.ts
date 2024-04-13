@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express'
 import { AuthError, BadRequestError, PrismaError } from '../../utils/Errors'
-import { patchPasswordService } from '../../services/credentials'
+import { createForgetPasswordTokenService, patchPasswordService } from '../../services/credentials'
+import { logger } from '../../utils/Logger'
+import { z } from 'zod'
 
 export const patchPassword = async (req: Request, res: Response): Promise<Response> => {
   const { oldPassword, newPassword } = req.body
@@ -14,8 +16,6 @@ export const patchPassword = async (req: Request, res: Response): Promise<Respon
       message: 'Password berhasil diubah'
     })
   } catch (error: any) {
-    console.log(error)
-
     if (
       error instanceof AuthError ||
       error instanceof PrismaError ||
@@ -26,6 +26,50 @@ export const patchPassword = async (req: Request, res: Response): Promise<Respon
         message: error.message
       })
     }
+
+    logger.error(error.message)
+    return res.status(500).json({
+      status: 'fail',
+      message: error.message
+    })
+  }
+}
+
+export const createForgetPasswordToken = async (req: Request, res: Response): Promise<Response> => {
+  const { email } = req.body
+
+  try {
+    const payloadSchema = z.object({
+      email: z.string().email()
+    })
+
+    payloadSchema.parse({
+      email
+    })
+
+    await createForgetPasswordTokenService(email as string)
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Kami telah mengirim tautan perubahan password ke email kamu'
+    })
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Bad payload',
+        issues: error.issues
+      })
+    }
+
+    if (error instanceof PrismaError || error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
     return res.status(500).json({
       status: 'fail',
       message: error.message

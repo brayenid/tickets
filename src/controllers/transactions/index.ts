@@ -3,7 +3,7 @@ import type * as Midtrans from '../../interfaces/Midtrans'
 import type { TicketPayload } from '../../interfaces/Tickets'
 import { config } from '../../utils/Config'
 import { z } from 'zod'
-import { BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
+import { AuthError, BadRequestError, NotFoundError, PrismaError } from '../../utils/Errors'
 import { getEventPriceByIdService } from '../../services/event-prices'
 import { addOfflineTransactionService, addTransactionService } from '../../services/transaction'
 import { generateId } from '../../utils/IDGenerator'
@@ -16,6 +16,8 @@ import {
 import { getEventByIdService } from '../../services/events'
 import { addTicketService } from '../../services/tickets'
 import { getUserByIdService } from '../../services/users'
+import { logger } from '../../utils/Logger'
+import { getOfflineSaleCapabilityService } from '../../services/account-atribute'
 
 export const addTransaction = async (req: Request, res: Response): Promise<Response> => {
   const { eventId, items } = req.body
@@ -153,9 +155,11 @@ export const addTransaction = async (req: Request, res: Response): Promise<Respo
       })
     }
 
+    logger.error(error.message)
+
     return res.status(500).json({
       status: 'fail',
-      message: error.message
+      message: 'Server error'
     })
   }
 }
@@ -169,6 +173,11 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
     if (!eventInfo.isOpen) {
       throw new BadRequestError('Event tidak dibuka untuk dijual')
     }
+    const isCapable = await getOfflineSaleCapabilityService(String(eventInfo.vendorId))
+    if (!isCapable) {
+      throw new BadRequestError('Vendor event ini tidak menyediakan penjualan offline')
+    }
+
     const currentDate = new Date()
     const eventDate = new Date(eventInfo.date)
 
@@ -296,9 +305,178 @@ export const addOfflineTransaction = async (req: Request, res: Response): Promis
       })
     }
 
+    logger.error(error.message)
+
     return res.status(500).json({
       status: 'fail',
-      message: error.message
+      message: 'Server error'
+    })
+  }
+}
+
+export const addOfflineTransactionVendor = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { eventId, items, userId } = req.body
+  const session = req.session.user
+  const id = generateId('OID')
+
+  try {
+    const eventInfo = await getEventByIdService(eventId as string)
+
+    const accessList = ['admin', 'sudo']
+    if (session?.id !== eventInfo.vendorId && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
+    }
+
+    if (!eventInfo.isOpen) {
+      throw new BadRequestError('Event tidak dibuka untuk dijual')
+    }
+    const isCapable = await getOfflineSaleCapabilityService(String(eventInfo.vendorId))
+    if (!isCapable) {
+      throw new BadRequestError('Vendor event ini tidak menyediakan penjualan offline')
+    }
+
+    const currentDate = new Date()
+    const eventDate = new Date(eventInfo.date)
+
+    if (currentDate >= eventDate) {
+      throw new BadRequestError('Masa penyelenggaraan event sudah lewat')
+    }
+
+    const orderSchema = z.object({
+      userId: z.string(),
+      eventId: z.string(),
+      items: z.array(
+        z.object({
+          eventPriceId: z.string(),
+          quantity: z.number()
+        })
+      )
+    })
+
+    orderSchema.parse({
+      eventId,
+      items,
+      userId
+    })
+
+    const { role, name } = await getUserByIdService(userId as string)
+
+    if (role !== 'customer') {
+      throw new BadRequestError('Hanya untuk customer')
+    }
+
+    /* CREATE AN ORDER ID RECORD */
+    await addOrderService({
+      id,
+      eventId,
+      userId,
+      source: 'offline',
+      status: 'settlement'
+    })
+
+    /* THIS ARRAY WILL BE STORED TO DB */
+    const itemsMapped: Midtrans.ItemDetails[] = await Promise.all(
+      items.map(async (item: Midtrans.ItemsByClient) => {
+        if (!item.eventPriceId) {
+          throw new Error('ID could not be empty')
+        }
+        const { name, price, stock } = await getEventPriceByIdService(item.eventPriceId)
+        const { name: eventName } = await getEventByIdService(eventId as string)
+
+        if (stock < 1) {
+          throw new BadRequestError(`Tiket ${name} habis`)
+        }
+
+        if (item.quantity > stock) {
+          throw new BadRequestError(`Kuantitas ${name} melebihi stok (${stock})`)
+        }
+
+        return {
+          id: generateId('TID'),
+          orderId: id,
+          name: eventName,
+          price,
+          quantity: item.quantity,
+          category: name,
+          eventPriceId: item.eventPriceId
+        }
+      })
+    )
+
+    await addOfflineTransactionService(itemsMapped)
+
+    /* GENERATING TICKET(S) BASED ON TRANSACTION */
+    const ticketsArr: TicketPayload[] = []
+
+    /* LOOP THROUGH EACH TRANSACTION/ORDER ITEM OBJECT */
+    for (let i = 0; i < itemsMapped.length; i++) {
+      const { id, quantity } = itemsMapped[i]
+
+      /* ANOTHER LOOP TO ADD A TICKET FOR 1 QTY */
+      for (let j = 0; j < (quantity ?? 0); j++) {
+        const ticketId = generateId('TX')
+
+        ticketsArr.push({
+          id: ticketId,
+          transactionId: id
+        })
+      }
+    }
+
+    await addTicketService(ticketsArr)
+
+    return res.status(201).json({
+      status: 'success',
+      message: `Pembelian untuk ${name} berhasil dibuat, silahkan cek tiket`
+    })
+  } catch (error: any) {
+    /*
+    ERROR POSSIBILITY :
+    - Invalid Event ID
+    - Invalid Price ID
+    */
+    const getOrderToDelete = await getOrderByIdService(id)
+
+    if (getOrderToDelete.id) {
+      await deleteOrderService(id)
+    }
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Bad payload',
+        issues: error.issues
+      })
+    }
+
+    if (error instanceof PrismaError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof BadRequestError || error instanceof NotFoundError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    if (error instanceof AuthError) {
+      return res.status(401).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
+
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
     })
   }
 }

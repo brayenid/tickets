@@ -43,6 +43,15 @@
       >
     </li>
     {{/isEqual}}
+    {{#isEqual user.role 'vendor'}}
+    <li>
+      <a
+        href="/vendor/dashboard/events"
+        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+        >Buat Event</a
+      >
+    </li>
+    {{/isEqual}}
     <li>
       <a
         href="/user/credential"

@@ -13,7 +13,7 @@ export const transporter = nodemailer.createTransport({
 })
 
 export const sendEmailService = async (payload: Mail): Promise<string> => {
-  const { target, subject, message } = payload
+  const { target, subject, message, msgBody, msgHeader } = payload
 
   try {
     const template = await fs.readFile('src/utils/templates/mail-verification.html', 'utf-8')
@@ -21,7 +21,7 @@ export const sendEmailService = async (payload: Mail): Promise<string> => {
       from: '"No-reply Kita Tiket" <no-reply@kitatiket.com>',
       to: target,
       subject,
-      html: Mustache.render(template, { message })
+      html: Mustache.render(template, { message, msgBody, msgHeader })
     }
     const mailInfo = await transporter.sendMail(mailConfig)
 

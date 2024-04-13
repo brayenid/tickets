@@ -1,0 +1,74 @@
+<main class="p-4">
+  {{> breadcrumbs }}
+
+  <section class="bg-white p-6 shadow-sm rounded-lg" id="price-list">
+    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Detail Kategori Harga</h2>
+    <form id="event-price" data-id="{{ eventPriceId }}">
+      <div class="grid gap-2 sm:grid-cols-2 md:grid-cols-4 sm:gap-3">
+        <div class="w-full">
+          <label
+            for="price-name"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Kategori Harga</label
+          >
+          <input
+            type="text"
+            id="price-name"
+            placeholder="Masukan kategori harga"
+            required=""
+            value="{{ name }}"
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="price-amount"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Harga</label
+          >
+          <input
+            type="text"
+            inputmode="numeric"
+            id="price-amount"
+            placeholder="Masukan harga"
+            required=""
+            value="{{addCurrencySeparator price }}"
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="price-stock"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Stok</label
+          >
+          <input
+            type="number"
+            id="price-stock"
+            class="input-styled"
+            placeholder="Masukan stok harga"
+            required=""
+            value="{{ stock }}"
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="price-grade"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Kelas Harga</label
+          >
+          <input
+            type="number"
+            id="price-grade"
+            class="input-styled"
+            placeholder="Masukan kelas harga"
+            required=""
+            value="{{ grade }}"
+          />
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="mt-4">Perbaharui</button>
+      </div>
+    </form>
+  </section>
+</main>
+<script src="/script/dashboard/events/event-price-detail.js"></script>

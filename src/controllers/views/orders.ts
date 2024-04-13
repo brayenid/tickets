@@ -17,6 +17,7 @@ export const orders = (req: Request, res: Response): void => {
 export const orderDetail = async (req: Request, res: Response): Promise<void> => {
   const { orderId } = req.params
   const order = await getOrderByIdService(orderId)
+
   const session = req.session.user
 
   if (order.userId !== session?.id) {
@@ -39,13 +40,15 @@ export const orderDetail = async (req: Request, res: Response): Promise<void> =>
     }
   ]
 
-  const settlementIssues = ['settlement', 'capture', 'expire', 'cancel', 'deny']
+  const settlementIssues = ['settlement', 'capture', 'expired', 'cancel', 'deny']
   const isOrderSettled = !!settlementIssues.includes(order.status)
+  const isOrderPending = order.status === 'pending'
 
   res.render('orders/order-detail', {
     title: 'Order Detail',
     order,
     paths,
-    isOrderSettled
+    isOrderSettled,
+    isOrderPending
   })
 }

@@ -111,6 +111,7 @@
         <span class="flex-1 ms-3 whitespace-nowrap">Aktivasi Tiket</span>
       </a>
     </li>
+    {{#isEqual user.role 'sudo'}}
     <hr />
     <li>
       <button
@@ -158,5 +159,6 @@
         </li>
       </ul>
     </li>
+    {{/isEqual}}
   </ul>
 </div>

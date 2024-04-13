@@ -12,7 +12,7 @@ export const addEventService = async (payload: EventPayload): Promise<void> => {
       data: {
         id,
         date,
-        description,
+        description: String(description),
         location,
         name,
         thumbnail,
@@ -44,7 +44,6 @@ export const getEventsService = async (
       name: true,
       location: true,
       date: true,
-      description: true,
       thumbnail: true,
       Vendor: {
         select: {
@@ -103,7 +102,6 @@ export const getEventsService = async (
       name: event.name,
       location: event.location,
       date: event.date,
-      description: event.description,
       thumbnail: event.thumbnail,
       vendor: event.Vendor.name,
       lowestPrice: event.EventPrices[0]?.price ?? 0
@@ -331,6 +329,149 @@ export const getEventsTotalService = async (
 
       eventsTotal = eventTotalFromDb._count.id
       await redis.setex('events:total', 900, eventsTotal)
+    }
+  }
+
+  return eventsTotal
+}
+
+// VENDOR SIDE
+export const getEventsBySessionService = async (
+  search: string = '',
+  vendorId: string,
+  limit: number = 9,
+  pageNumber: number = 1
+): Promise<EventPayload[]> => {
+  const offset = (pageNumber - 1) * limit
+
+  const events = await prisma.events.findMany({
+    select: {
+      id: true,
+      isOpen: true,
+      name: true,
+      location: true,
+      date: true,
+      thumbnail: true,
+      Vendor: {
+        select: {
+          name: true
+        }
+      },
+      EventPrices: {
+        select: {
+          price: true
+        },
+        orderBy: {
+          grade: 'asc'
+        },
+        take: 1
+      }
+    },
+    where: {
+      OR: [
+        {
+          id: {
+            contains: search
+          }
+        },
+        {
+          name: {
+            contains: search
+          }
+        },
+        {
+          location: {
+            contains: search
+          }
+        }
+      ],
+      vendorId
+    },
+    orderBy: [
+      {
+        createdAt: 'desc'
+      }
+    ],
+    skip: offset,
+    take: limit
+  })
+
+  const eventsMapped = events.map((event) => {
+    return {
+      id: event.id,
+      isOpen: event.isOpen,
+      name: event.name,
+      location: event.location,
+      date: event.date,
+      thumbnail: event.thumbnail,
+      vendor: event.Vendor.name,
+      lowestPrice: event.EventPrices[0]?.price ?? 0
+    }
+  })
+
+  return eventsMapped
+}
+
+export const getEventsTotalBySessionService = async (
+  search: string = '',
+  vendorId: string,
+  page: number = 0,
+  limit: number = 0
+): Promise<number> => {
+  let eventsTotal: number = 0
+
+  if (page || limit || search) {
+    const eventTotalFromDb = await prisma.events.aggregate({
+      _count: {
+        id: true
+      },
+      where: {
+        OR: [
+          {
+            name: {
+              contains: search
+            }
+          },
+          {
+            location: {
+              contains: search
+            }
+          }
+        ],
+        vendorId
+      }
+    })
+
+    eventsTotal = eventTotalFromDb._count.id
+  } else {
+    const eventsFromCache = await redis.get(`events-${vendorId}:total`)
+
+    if (eventsFromCache) {
+      eventsTotal = Number(eventsFromCache)
+    } else {
+      const eventTotalFromDb = await prisma.events.aggregate({
+        _count: {
+          id: true
+        },
+        where: {
+          OR: [
+            {
+              name: {
+                contains: search
+              }
+            },
+            {
+              location: {
+                contains: search
+              }
+            }
+          ],
+          vendorId
+        }
+      })
+
+      eventsTotal = eventTotalFromDb._count.id
+      await redis.setex(`events-${vendorId}:total`, 900, eventsTotal)
     }
   }
 

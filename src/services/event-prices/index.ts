@@ -13,7 +13,7 @@ export const addEventPriceService = async (payload: EventPricePayload): Promise<
         id: String(id),
         name,
         price,
-        eventId,
+        eventId: String(eventId),
         stock,
         grade
       }
@@ -37,7 +37,12 @@ export const getEventPriceByIdService = async (id: string): Promise<EventPricePa
       price: true,
       eventId: true,
       stock: true,
-      grade: true
+      grade: true,
+      event: {
+        select: {
+          vendorId: true
+        }
+      }
     },
     where: {
       id
@@ -49,7 +54,17 @@ export const getEventPriceByIdService = async (id: string): Promise<EventPricePa
     throw new PrismaError('Invalid event price')
   }
 
-  return eventPrices as EventPricePayload
+  const mapped = {
+    id: eventPrices.id,
+    name: eventPrices.name,
+    price: eventPrices.price,
+    eventId: eventPrices.eventId,
+    stock: eventPrices.stock,
+    grade: eventPrices.grade,
+    vendorId: eventPrices.event.vendorId
+  }
+
+  return mapped
 }
 
 export const getEventPriceByEventIdService = async (

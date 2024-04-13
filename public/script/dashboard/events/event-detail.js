@@ -156,11 +156,12 @@ eventPriceForm.addEventListener('submit', async (e) => {
 
   const { isConfirmed } = await Swal.fire({
     icon: 'question',
-    title: 'Add New Price',
-    text: 'Are you sure to add new price?',
+    title: 'Tambah Kategori Harga',
+    text: 'Kamu yakin menambah kategori harga baru?',
     showConfirmButton: true,
     showCancelButton: true,
-    confirmButtonText: 'Add'
+    confirmButtonText: 'Tambah',
+    cancelButtonText: 'Batal'
   })
   if (isConfirmed) {
     const response = await fetch('/api/event-price', {
@@ -254,7 +255,7 @@ const deleteEventPrice = async (id) => {
     const responseJson = await response.json()
 
     if (response.status !== 200) {
-      toastErr(response.message)
+      toastErr(responseJson.message)
       return
     }
     toastSuccess(responseJson.message)

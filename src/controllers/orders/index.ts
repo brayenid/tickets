@@ -9,7 +9,12 @@ import {
 } from '../../services/orders'
 import { groupByOrdersSource } from '../../utils/helpers/GroupOrdersSource'
 import { groupByDay } from '../../utils/helpers/GroupByTime'
-import { getTransactionsAmountTotalService } from '../../services/transaction'
+import {
+  getTransactionByOrderIdService,
+  getTransactionsAmountTotalService
+} from '../../services/transaction'
+import { config } from '../../utils/Config'
+import { operateStock } from '../../utils/helpers/OperateStockEventPrice'
 
 export const getOrdersByUserId = async (req: Request, res: Response): Promise<Response> => {
   const session = req.session.user
@@ -146,6 +151,47 @@ export const getOrdersByDay = async (req: Request, res: Response): Promise<Respo
     return res.status(500).json({
       status: 'fail',
       message: error.message
+    })
+  }
+}
+
+export const orderCancel = async (req: Request, res: Response): Promise<Response> => {
+  const { orderId } = req.params
+  const serverKey = btoa(config.midtrans.options.serverKey)
+  const url = `https://api.sandbox.midtrans.com/v2/${orderId}/cancel`
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Basic ${serverKey}`
+      }
+    })
+
+    if (response.status !== 200) {
+      throw new BadRequestError('Gagal membatalkan order')
+    }
+
+    const transactions = await getTransactionByOrderIdService(orderId)
+
+    await operateStock(transactions, 'add')
+    return res.status(200).json({
+      status: 'success',
+      message: 'Order berhasil dihapus'
+    })
+  } catch (error: any) {
+    if (error instanceof BadRequestError) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+
+    logger.error(error.message)
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Server error'
     })
   }
 }

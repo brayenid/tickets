@@ -42,7 +42,8 @@
               </tr>
             </thead>
             <tbody>
-              {{#each tickets}}
+              {{#moreThanZero tickets.length}}
+              {{#each ../tickets}}
               <tr class="border-b dark:border-gray-700">
                 <td class="px-4 py-3">{{ id }}</td>
                 <td class="px-4 py-3">{{ category }}</td>
@@ -54,11 +55,16 @@
                 </td>
               </tr>
               {{/each}}
+              {{else}}
+              <tr class="border-b dark:border-gray-700">
+                <td class="px-4 py-3 text-center" colspan="6">No Data!</td>
+              </tr>
+              {{/moreThanZero}}
             </tbody>
           </table>
         </div>
         {{!-- PAGINATION --}}
-        {{> create-customer-pagination }}
+        {{> tickets-pagination }}
       </div>
     </div>
   </section>

@@ -11,6 +11,7 @@ import { logger } from '../../utils/Logger'
 import { groupByTixCatFreq } from '../../utils/helpers/GroupByTicketCat'
 import { generateTicketDirectRes } from '../../utils/TicketPDFGenerator'
 import { z } from 'zod'
+import { getEventByIdService } from '../../services/events'
 
 export const getTicketsByUserId = async (req: Request, res: Response): Promise<Response> => {
   const session = req.session.user
@@ -128,8 +129,11 @@ export const ticketToPdfDirect = async (
   try {
     const accessList = ['admin', 'sudo']
     const ticket = await getTicketByIdService(ticketId)
+    const eventInfo = await getEventByIdService(ticket.event.id)
+    const isEventOwner = req.session.user?.id === eventInfo.vendorId
+    const isNotPermitted = !accessList.includes(String(session?.role))
 
-    if (session?.id !== ticket.userId && !accessList.includes(String(session?.role))) {
+    if (session?.id !== ticket.userId && isNotPermitted && !isEventOwner) {
       throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
     }
 
@@ -157,6 +161,7 @@ export const ticketToPdfDirect = async (
 
 export const ticketActivation = async (req: Request, res: Response): Promise<Response> => {
   const { eventId, ticketId } = req.body
+  const session = req.session.user
 
   const payloadSchema = z.object({
     eventId: z.string(),
@@ -168,6 +173,13 @@ export const ticketActivation = async (req: Request, res: Response): Promise<Res
       eventId,
       ticketId
     })
+
+    const eventDetail = await getEventByIdService(eventId as string)
+
+    const accessList = ['admin', 'sudo']
+    if (session?.id !== eventDetail.vendorId && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
+    }
 
     await ticketActivationService(ticketId as string, eventId as string)
 
@@ -199,11 +211,20 @@ export const ticketActivation = async (req: Request, res: Response): Promise<Res
 
 export const getActiveTickets = async (req: Request, res: Response): Promise<Response> => {
   const { eventId } = req.query
+  const session = req.session.user
 
   try {
     if (!eventId) {
       throw new BadRequestError('Sertakan event ID')
     }
+
+    const eventDetail = await getEventByIdService(eventId as string)
+
+    const accessList = ['admin', 'sudo']
+    if (session?.id !== eventDetail.vendorId && !accessList.includes(String(session?.role))) {
+      throw new AuthError('Kamu tidak memiliki akses melihat sumber daya ini')
+    }
+
     const tickets = await getActiveTicketsService(eventId as string, 10)
 
     return res.status(200).json({

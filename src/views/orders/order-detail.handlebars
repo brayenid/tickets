@@ -39,7 +39,7 @@
             </th>
             <td class="px-6 py-4">: {{ order.status }}</td>
           </tr>
-          <tr class="bg-white dark:bg-gray-800">
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
             <th
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -47,6 +47,24 @@
               Pembayaran Via
             </th>
             <td class="px-6 py-4">: {{ order.source }}</td>
+          </tr>
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Dibuat Pada
+            </th>
+            <td class="px-6 py-4">: {{formatISODate order.createdAt }}</td>
+          </tr>
+          <tr class="bg-white dark:bg-gray-800">
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Diperbaharui Pada
+            </th>
+            <td class="px-6 py-4">: {{formatISODate order.updatedAt }}</td>
           </tr>
         </tbody>
       </table>
@@ -60,7 +78,7 @@
             class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
           >
             <tr>
-              <th scope="col" class="px-6 py-3">Transaction ID</th>
+              <th scope="col" class="px-6 py-3">Kategori</th>
               <th scope="col" class="px-6 py-3">Kuantitas</th>
               <th scope="col" class="px-6 py-3">Harga</th>
             </tr>
@@ -69,7 +87,7 @@
             {{#each order.items}}
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td scope="row" class="px-6 py-4">
-                {{ id }}
+                {{ category }}
               </td>
               <td class="px-6 py-4">{{ quantity }}</td>
               <td class="px-6 py-4">{{addCurrencySeparator amount }}</td>
@@ -81,17 +99,16 @@
     </div>
   </div>
   {{#unless isOrderSettled}}
-  <div class="my-4 flex justify-end" id="payment-btn-container">
-    <button type="button" onclick="openPayment()" class="w-full md:w-max">Bayar</button>
+  <div class="my-4 flex justify-end gap-2" id="payment-btn-container">
+    <button type="button" onclick="openPayment()" class="w-max">Bayar</button>
+    {{#if isOrderPending}}
+    <button type="button" onclick="cancelPayment()" class="w-max red">Batalkan</button>
+    {{/if}}
   </div>
   {{/unless}}
   <div id="snap-container"></div>
 </main>
-<script
-  src="https://cdn.socket.io/4.7.5/socket.io.min.js"
-  integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
-  crossorigin="anonymous"
-></script>
+<script src="/script/packages/socket.io.min.js"></script>
 <script
   type="text/javascript"
   src="https://app.sandbox.midtrans.com/snap/snap.js"

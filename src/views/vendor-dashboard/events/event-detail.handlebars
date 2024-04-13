@@ -1,0 +1,242 @@
+<link href="/style/packages/quill.snow.css" rel="stylesheet" />
+<main class="p-4 space-y-4">
+  {{> breadcrumbs }}
+
+  {{!-- Edit Event --}}
+  <section class="bg-white p-6 shadow-sm rounded-lg" id="detail">
+    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Detail : {{ event.name }}</h2>
+    {{!-- Keep create event id to avoid repetitive css --}}
+    <form id="create-event" data-event-id="{{ event.id }}">
+      <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
+        <div class="w-full">
+          <label
+            for="event-name"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Nama Event</label
+          >
+          <input
+            type="text"
+            name="name"
+            id="event-name"
+            class="input-styled"
+            placeholder="Masukan nama event"
+            required=""
+            value="{{ event.name }}"
+          />
+        </div>
+        <div class="w-full">
+          <label for="is-open" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Status Penjualan</label
+          >
+          <select id="is-open" class="input-styled">
+            {{#isSelected true event.isOpen}}
+            <option value="1" selected>Buka</option>
+            <option value="0">Tutup</option>
+            {{else}}
+            <option value="1">Buka</option>
+            <option value="0" selected>Tutup</option>
+            {{/isSelected}}
+          </select>
+        </div>
+        <div class="w-full">
+          <label
+            for="event-location"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Lokasi</label
+          >
+          <input
+            type="text"
+            name="event-location"
+            id="event-location"
+            class="input-styled"
+            placeholder="Masukan lokasi event"
+            required=""
+            value="{{ event.location }}"
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="event-date"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Waktu Penyelenggaraan</label
+          >
+          <input
+            type="datetime-local"
+            name="event-date"
+            id="event-date"
+            class="input-styled"
+            placeholder="Event Date"
+            required=""
+            value="{{ event.date }}"
+          />
+        </div>
+        <div>
+          <label
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            for="event-thumbnail"
+            >Thumbnail</label
+          >
+          <input
+            class="input-file"
+            aria-describedby="event-thumbnail"
+            id="event-thumbnail"
+            type="file"
+          />
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-300" id="file_input_help">
+            PNG, JPG (MAX. 512kb).
+          </p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="editor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Deskripsi</label
+          >
+          <div class="ql-container-customed">
+            <div id="editor"></div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end mt-4 gap-2">
+        <button type="submit" id="event-update-btn">Perbaharui Event</button>
+      </div>
+    </form>
+  </section>
+
+  {{!-- Add Event Prices --}}
+  <section class="bg-white p-6 shadow-sm rounded-lg" id="price-list">
+    <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Daftar Harga</h2>
+    <form id="event-price">
+      <div class="grid gap-2 sm:grid-cols-2 md:grid-cols-4 sm:gap-3">
+        <div class="w-full">
+          <label
+            for="price-name"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Kategori Harga</label
+          >
+          <input type="text" id="price-name" placeholder="Masukan kategori harga" required="" />
+        </div>
+        <div class="w-full">
+          <label
+            for="price-amount"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Harga</label
+          >
+          <input
+            type="text"
+            inputmode="numeric"
+            id="price-amount"
+            placeholder="Masukan harga"
+            required=""
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="price-stock"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Stok</label
+          >
+          <input
+            type="number"
+            id="price-stock"
+            class="input-styled"
+            placeholder="Masukan stok harga"
+            required=""
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="price-grade"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Kelas Harga</label
+          >
+          <input
+            type="number"
+            id="price-grade"
+            class="input-styled"
+            placeholder="Masukan kelas harga"
+            required=""
+          />
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="mt-4">Tambah</button>
+      </div>
+    </form>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead
+          class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+        >
+          <tr>
+            <th scope="col" class="px-4 py-3">Nama</th>
+            <th scope="col" class="px-4 py-3">Harga</th>
+            <th scope="col" class="px-4 py-3">Stok</th>
+            <th scope="col" class="px-4 py-3">Kelas</th>
+            <th scope="col" class="px-4 py-3">
+              <span class="sr-only">Aksi</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#moreThanZero eventPrices.length }}
+          {{#each ../eventPrices}}
+          <tr class="border-b dark:border-gray-700">
+            <th
+              scope="row"
+              class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              {{ name }}
+            </th>
+            <td class="px-4 py-3">{{addCurrencySeparator price }}</td>
+            <td class="px-4 py-3">{{ stock }}</td>
+            <td class="px-4 py-3">{{ grade }}</td>
+            <td class="px-4 py-3">
+              <div class="flex gap-2 justify-end">
+                <a
+                  href="/vendor/dashboard/events/{{ ../../event.id}}/event-price/{{ id }}"
+                  class="link-styled !p-2"
+                  title="Edit"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-white"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="m227.32 73.37l-44.69-44.68a16 16 0 0 0-22.63 0L36.69 152A15.86 15.86 0 0 0 32 163.31V208a16 16 0 0 0 16 16h44.69a15.86 15.86 0 0 0 11.31-4.69l83.67-83.66l3.48 13.9l-36.8 36.79a8 8 0 0 0 11.31 11.32l40-40a8 8 0 0 0 2.11-7.6l-6.9-27.61L227.32 96a16 16 0 0 0 0-22.63M192 108.69L147.32 64l24-24L216 84.69Z"
+                    />
+                  </svg>
+                </a>
+                <button
+                  class="red !p-2 !text-xs"
+                  onclick="deleteEventPrice('{{ id }}')"
+                  title="Hapus"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 text-white"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16M112 168a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm48 0a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm0-120H96v-8a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8Z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {{/each}}
+          {{else}}
+          <tr class="text-center">
+            <td class="px-4 py-3" colspan="5">Tidak ada data</td>
+          </tr>
+          {{/moreThanZero}}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script src="/script/packages/quill.js"></script>
+<script src="/script/vendor-dashboard/events/event-detail.js"></script>

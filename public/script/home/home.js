@@ -79,7 +79,7 @@ const loadEvents = async (search) => {
             d="M11.147 14.328c-.673-.672-.667-1.638-.265-2.403a.75.75 0 0 1 1.04-1.046c.34-.18.713-.276 1.085-.272a.75.75 0 0 1-.014 1.5a.88.88 0 0 0-.609.277c-.387.387-.285.775-.177.884c.11.109.497.21.884-.177c.784-.784 2.138-1.044 3.006-.177c.673.673.667 1.639.264 2.404a.75.75 0 0 1-1.04 1.045a2.201 2.201 0 0 1-1.472.232a.75.75 0 1 1 .302-1.47c.177.037.463-.021.708-.266c.388-.388.286-.775.177-.884c-.109-.109-.496-.21-.884.177c-.784.784-2.138 1.044-3.005.176m-1.126-4.035a2 2 0 1 0-2.828-2.828a2 2 0 0 0 2.828 2.828"
           />
         </svg>
-        <p>Start : Rp. ${addCurrencySeparator(item.lowestPrice)}</p>
+        <p>Mulai : IDR. ${addCurrencySeparator(item.lowestPrice)}</p>
       </div>
     </div>
       `
@@ -98,7 +98,7 @@ const loadMore = async () => {
   // If reached the last event
   if (currentEventArrLength === oldEventArrLength) {
     eventLoaderEl.classList.add('hidden')
-    toastInfo("You've reached the last event")
+    toastInfo('Kamu mencapai halaman terakhir')
   }
 }
 
@@ -125,7 +125,7 @@ const eventLoaderLoading = (isLoading) => {
     `
     eventLoaderEl.setAttribute('disabled', '')
   } else {
-    eventLoaderEl.innerHTML = 'Load More'
+    eventLoaderEl.innerHTML = 'Muat'
     eventLoaderEl.removeAttribute('disabled')
   }
 }
@@ -134,15 +134,15 @@ const changeContainerTitle = (view) => {
   if (view === 'search') {
     containerTitle.innerHTML = `
   <h2 class="styled-h2">
-  Search
-    <span class="sub">Result : </span>
+  Hasil
+    <span class="sub">Pencarian : </span>
   </h2>
   `
   } else {
     containerTitle.innerHTML = `
     <h2 class="styled-h2">
-    Latest
-      <span class="sub">Events : </span>
+    Event
+      <span class="sub">Terbaru : </span>
     </h2>
     `
   }
@@ -167,7 +167,7 @@ searchEl.addEventListener('submit', async (e) => {
     eventLoaderEl.classList.add('hidden')
 
     eventsContainer.innerHTML = `
-    <div class="no-event"> No event found</div>
+    <div class="no-event">Tidak ada event ditemukan</div>
     `
   }
 

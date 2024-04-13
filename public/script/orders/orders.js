@@ -9,6 +9,9 @@ const detectStatus = (status) => {
   if (['settlement', 'capture'].includes(status)) {
     return 'primary-badge order-badge'
   }
+  if (status === 'waiting') {
+    return 'blue-badge order-badge'
+  }
   return 'red-badge order-badge'
 }
 

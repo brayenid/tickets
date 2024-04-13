@@ -5,7 +5,7 @@
   <section class="bg-white p-6 shadow-sm rounded-lg" id="detail">
     <h2 class="mb-6 text-xl font-bold text-gray-900 dark:text-white">Detail : {{ vendor.name }}</h2>
     {{!-- Keep create vendor id to avoid repetitive css --}}
-    <form id="create-vendor" class="p-4">
+    <form id="create-vendor" class="p-4" data-id="{{ vendor.id }}">
       <div class="grid gap-2 sm:grid-cols-2 sm:gap-3">
         <div>
           <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -81,7 +81,21 @@
           />
         </div>
       </div>
-      <div class="flex justify-end mt-4">
+      <div class="flex justify-end mt-4 gap-2">
+        {{#if offlineSaleCapability}}
+        <button type="button" id="offline-cap" class="red" onclick="setOfflineCapability()">
+          Non-Aktif Penjualan Offline
+        </button>
+        {{else}}
+        <button
+          type="button"
+          id="offline-cap"
+          class="primary-lite"
+          onclick="setOfflineCapability()"
+        >
+          Aktifkan Penjualan Offline
+        </button>
+        {{/if}}
         <button type="submit" id="add-vendor-btn" class="cursor-not-allowed" disabled>
           Perbaharui
         </button>
@@ -90,4 +104,4 @@
   </section>
 </main>
 
-<script src="/script/dashboard/events/event-detail.js"></script>
+<script src="/script/dashboard/vendors/vendor-detail.js"></script>

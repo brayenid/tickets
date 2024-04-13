@@ -62,7 +62,8 @@
               </tr>
             </thead>
             <tbody>
-              {{#each vendors}}
+              {{#moreThanZero vendors.length}}
+              {{#each ../vendors}}
               <tr class="border-b dark:border-gray-700">
                 <th
                   scope="row"
@@ -77,6 +78,11 @@
                 </td>
               </tr>
               {{/each}}
+              {{else}}
+              <tr class="border-b dark:border-gray-700">
+                <td class="px-4 py-3 text-center" colspan="4">No Data!</td>
+              </tr>
+              {{/moreThanZero}}
             </tbody>
           </table>
         </div>

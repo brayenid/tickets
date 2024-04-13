@@ -1,0 +1,110 @@
+<main id="ticket-detail" class="p-4" data-tx-id="{{ ticket.id }}">
+  {{> breadcrumbs }}
+  <div class="bg-white rounded p-4 shadow-sm">
+    <h2 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Detail Tiket</h2>
+    <div class="detail flex-[2.4] space-y-4 overflow-x-auto">
+      <div class="border border-gray-200 overflow-hidden rounded-lg">
+        <table class="w-full text-xs sm:text-sm text-left rtl:text-right text-gray-600">
+          <tbody>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Ticket ID
+              </th>
+              <td class="px-6 py-4">: {{ ticket.id }}</td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Order ID
+              </th>
+              <td class="px-6 py-4">
+                :
+                <a class="styled" href="/dashboard/orders/{{ ticket.orderId }}">{{
+                  ticket.orderId
+                }}</a>
+              </td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Pelanggan
+              </th>
+              <td class="px-6 py-4">
+                :
+                {{ userName }}
+              </td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Keaktifan
+              </th>
+              <td class="px-6 py-4">: {{ ticket.isActive }}</td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Kategori
+              </th>
+              <td class="px-6 py-4">: {{ ticket.category }}</td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Nama Event
+              </th>
+              <td class="px-6 py-4">
+                : <a class="styled" href="/events/{{ ticket.event.id }}">{{ ticket.event.name }}</a>
+              </td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Tanggal Event
+              </th>
+              <td class="px-6 py-4">: {{formatISODate ticket.event.date }}</td>
+            </tr>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Lokasi Event
+              </th>
+              <td class="px-6 py-4">: {{ ticket.event.location }}</td>
+            </tr>
+            <tr class="bg-white dark:bg-gray-800">
+              <th
+                scope="row"
+                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                Tanggal Dibuat
+              </th>
+              <td class="px-6 py-4">: {{formatISODate ticket.createdAt }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="flex justify-end">
+        <button type="button" onclick="generateTicket()" id="download-btn">Unduh</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="/script/dashboard/tickets/ticket-detail.js"></script>
