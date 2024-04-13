@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { getOrderByIdService } from '../../services/orders'
+import { config } from '../../utils/Config'
 
 export const orders = (req: Request, res: Response): void => {
   const paths = [
@@ -17,6 +18,9 @@ export const orders = (req: Request, res: Response): void => {
 export const orderDetail = async (req: Request, res: Response): Promise<void> => {
   const { orderId } = req.params
   const order = await getOrderByIdService(orderId)
+  const midtransUrl = config.midtrans.options.isProduction
+    ? 'https://app.midtrans.com/snap/snap.js'
+    : 'https://app.sandbox.midtrans.com/snap/snap.js'
 
   const session = req.session.user
 
@@ -49,6 +53,8 @@ export const orderDetail = async (req: Request, res: Response): Promise<void> =>
     order,
     paths,
     isOrderSettled,
-    isOrderPending
+    isOrderPending,
+    midtransUrl,
+    midtransClient: config.midtrans.options.clientKey
   })
 }

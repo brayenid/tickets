@@ -120,7 +120,9 @@ export const processTransactionNotif = async (req: Request, res: Response): Prom
         await operateStock(transactions, 'min')
       } catch (error: any) {
         const serverKey = btoa(config.midtrans.options.serverKey)
-        const url = `https://api.sandbox.midtrans.com/v2/${orderId}/cancel`
+        const url = config.midtrans.options.isProduction
+          ? `https://api.midtrans.com/v2/${orderId}/cancel`
+          : `https://api.sandbox.midtrans.com/v2/${orderId}/cancel`
 
         try {
           const response = await fetch(url, {

@@ -8,7 +8,7 @@ export const config = {
   midtrans: {
     options: {
       clientKey: process.env.CLIENT_KEY ?? '',
-      isProduction: process.env.NODE_ENV?.trimEnd() === 'production',
+      isProduction: process.env.NODE_ENV?.trimEnd() !== 'dev',
       serverKey: process.env.SERVER_KEY ?? ''
     }
   }
