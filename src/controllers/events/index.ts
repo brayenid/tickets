@@ -24,9 +24,7 @@ import { logger } from '../../utils/Logger'
 
 export const addEvent = async (req: FileRequest, res: Response): Promise<Response> => {
   const { name, date, description, location, vendorId }: EventBasic = req.body
-  const thumbnail = getUrlPath(req.file, 8, 9)
-
-  console.log({ thumbnail })
+  const thumbnail = getUrlPath(req.file)
 
   const id: string = req.fileId ?? ''
 
@@ -101,7 +99,7 @@ export const addEvent = async (req: FileRequest, res: Response): Promise<Respons
 
 export const updateEvent = async (req: Request, res: Response): Promise<Response> => {
   const { date, description, location, name, vendorId, isOpen } = req.body
-  const uploadedThumbnail = getUrlPath(req?.file, 8, 9)
+  const uploadedThumbnail = getUrlPath(req?.file)
 
   const { eventId: id } = req.params
 
@@ -220,7 +218,16 @@ export const deleteEvent = async (req: Request, res: Response): Promise<Response
 
   try {
     const thumbnail = await deleteEventService(eventId)
-    const thumbnailPath = path.resolve(__dirname, '..', '..', '..', 'public', thumbnail)
+    const thumbnailPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'public',
+      'uploads',
+      'events',
+      thumbnail
+    )
 
     await fs.unlink(thumbnailPath)
     return res.status(200).json({
@@ -432,7 +439,7 @@ export const getEventAttendersGender = async (req: Request, res: Response): Prom
 export const addEventBySession = async (req: FileRequest, res: Response): Promise<Response> => {
   const { name, date, description, location }: EventBasic = req.body
   const vendorId = req.session.user?.id
-  const thumbnail = getUrlPath(req.file, 8, 9)
+  const thumbnail = getUrlPath(req.file)
 
   const id: string = req.fileId ?? ''
 
@@ -508,7 +515,7 @@ export const addEventBySession = async (req: FileRequest, res: Response): Promis
 export const updateEventBySession = async (req: Request, res: Response): Promise<Response> => {
   const { date, description, location, name, isOpen } = req.body
   const vendorId = req.session.user?.id ?? ''
-  const uploadedThumbnail = getUrlPath(req?.file, 8, 9)
+  const uploadedThumbnail = getUrlPath(req?.file)
   const { eventId: id } = req.params
 
   try {

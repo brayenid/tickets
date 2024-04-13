@@ -57,7 +57,9 @@ const loadEvents = async (search) => {
       item?.isOpen ? 'Sale' : 'Close'
     }</div>
       <a href="/events/${item.id}">
-          <img src="${item.thumbnail}" alt="${item.name}" loading="lazy" title="${item.name}" />
+          <img src="/uploads/events/${item.thumbnail}" alt="${item.name}" loading="lazy" title="${
+      item.name
+    }" />
           </a>
       </div>
       <a href="/events/${item.id}">

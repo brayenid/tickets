@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="/user/tickets/${ticket.id}" class="block">
           <div class="item">
           <div class="img-container">
-            <img src="/${ticket.event.thumbnail}" alt="${ticket.event.name}">
+            <img src="/uploads/events/${ticket.event.thumbnail}" alt="${ticket.event.name}">
           </div>
             <div class="main">
               <div class="item-header">

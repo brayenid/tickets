@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="/user/orders/${order.id}" class="block">
         <div class="item">
             <div class="img-container">
-                <img src="/${order.eventThumbnail}" alt="${order.eventName}">
+                <img src="/uploads/events/${order.eventThumbnail}" alt="${order.eventName}">
             </div>
             <div class="main">
                 <div class="item-header">

@@ -1,19 +1,15 @@
 import { config } from './Config'
 
-export const getUrlPath = (
-  fullPath: Express.Multer.File | undefined,
-  start: number,
-  end: number
-): string => {
+export const getUrlPath = (fullPath: Express.Multer.File | undefined): string => {
   if (!fullPath) {
     return 'NO_FULLPATH' // Atau tindakan lain sesuai kebutuhan Anda ketika req.file adalah undefined
   }
 
-  console.log({ fullPath })
-
   if (config.env === 'dev') {
-    return fullPath.path.split('\\').splice(start, end).join('/')
+    const splitPath = fullPath.path.split('\\')
+    return splitPath[splitPath.length - 1]
   } else {
-    return fullPath.path.split('/').splice(start, end).join('/')
+    const splitPath = fullPath.path.split('/')
+    return splitPath[splitPath.length - 1]
   }
 }
