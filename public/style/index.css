@@ -1419,6 +1419,11 @@ input:checked + .toggle-bg {
   margin-bottom: 1.5rem;
 }
 
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .\!mt-2 {
   margin-top: 0.5rem !important;
 }

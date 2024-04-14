@@ -38,6 +38,7 @@ import {
   ticketDetailDashboardVendor,
   ticketListVendor
 } from '../controllers/views/vendor-dashboard'
+import { termsAndConditions } from '../controllers/views/policies'
 
 const router: Router = Router()
 const customerAuth = new Auth('customer', [], 'view')
@@ -62,6 +63,8 @@ router.get('/user/tickets/:ticketId', customerAuth.validate, ticketDetail)
 
 router.get('/user/credential', customerAuthLoose.validate, patchPassword)
 router.get('/credential/forget', forgetPassword)
+
+router.get('/tac', termsAndConditions)
 
 /* DASHBOARD */
 router.get('/dashboard', adminAuth.validate, main)
