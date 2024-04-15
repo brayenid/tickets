@@ -7,6 +7,7 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store'
 import { prisma } from './utils/Db'
 import { create } from 'express-handlebars'
 import { limit } from './utils/RateLimiter'
+import compression from 'compression'
 
 import {
   loopTimes,
@@ -39,6 +40,21 @@ dotenv.config()
 const port: number | string = process.env.PORT ?? 3000
 const limiter = limit(300)
 
+function shouldCompress(req: Request, res: Response): boolean {
+  if (req.headers['x-no-compression']) {
+    // don't compress responses with this request header
+    return false
+  }
+
+  // fallback to standard filter function
+  return compression.filter(req, res)
+}
+
+app.use(
+  compression({
+    filter: shouldCompress
+  })
+)
 app.use(limiter)
 app.use(express.static('public'))
 app.use(express.json())

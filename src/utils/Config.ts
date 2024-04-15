@@ -1,5 +1,5 @@
 console.log({
-  mode: process.env.NODE_ENV
+  mode: process.env.NODE_ENV ?? 'prod'
 })
 
 export const config = {
