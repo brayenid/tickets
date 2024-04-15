@@ -6,6 +6,10 @@ export const getUrlPath = (fullPath: Express.Multer.File | undefined): string =>
   }
 
   if (config.env === 'dev') {
+    if (config.run === 'ubuntu') {
+      const splitPath = fullPath.path.split('/')
+      return splitPath[splitPath.length - 1]
+    }
     const splitPath = fullPath.path.split('\\')
     return splitPath[splitPath.length - 1]
   } else {

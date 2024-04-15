@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "set NODE_ENV=dev&& nodemon src/index.ts",
     "serve-dev": "set NODE_ENV=dev&& node dist/index.js",
-    "ubuntu-dev": "NODE_ENV=dev node dist/index.js",
+    "ubuntu-dev": "NODE_ENV=dev ENV_RUN=ubuntu node dist/index.js",
     "migrate": "npx prisma migrate dev --name tickets",
     "tailwind": "npx tailwindcss -i ./frontend/input.css -o ./public/style/index.css --watch",
     "copyfile": "copyfiles -u 1 src/views/**/*.handlebars dist && copyfiles -u 1 src/utils/assets/* dist",

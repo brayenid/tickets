@@ -1,9 +1,11 @@
 console.log({
-  mode: process.env.NODE_ENV ?? 'prod'
+  mode: process.env.NODE_ENV ?? 'prod',
+  run: process.env.ENV_RUN ?? 'unknown'
 })
 
 export const config = {
   env: process.env.NODE_ENV?.trimEnd(),
+  run: process.env.ENV_RUN,
   host: process.env.HOST,
   protocol: process.env.PROTOCOL,
   transaction: {
