@@ -3698,6 +3698,7 @@ ol {
   margin-bottom: 1rem;
   font-size: 1.125rem;
   line-height: 1.75rem;
+  line-height: 1.625;
 }
 
 .book-stuff > :not([hidden]) ~ :not([hidden]) {

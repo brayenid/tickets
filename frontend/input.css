@@ -204,7 +204,7 @@ ol {
 }
 
 .event-stuff .description {
-  @apply text-lg my-4;
+  @apply text-lg my-4 leading-relaxed;
 }
 
 .book-stuff {
