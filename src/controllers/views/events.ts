@@ -20,6 +20,6 @@ export const eventDetail = async (req: Request, res: Response): Promise<void> =>
     event,
     eventPrices,
     paths,
-    fullPath: config.host + req.originalUrl
+    fullPath: `${config.protocol}${config.host}`
   })
 }

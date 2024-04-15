@@ -8,6 +8,25 @@
     <link rel="stylesheet" href="/style/packages/toastify.min.css" />
     <link rel="stylesheet" href="/style/packages/flowbite.min.css" />
     <link rel="stylesheet" href="/style/index.css" />
+
+    <meta property="og:title" content="{{ title }}" />
+    <meta
+      property="og:description"
+      content="Ayo beli tiket {{
+        event.name
+      }} sekarang juga sebelum kehabisan. Event akan diselenggarakan di {{
+        event.location
+      }} pada {{formatISODate
+        event.date
+      }}"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="{{ fullPath }}/uploads/events/{{ event.thumbnail }}" />
+    <meta property="og:image:alt" content="{{ title }}" />
+    <meta property="og:site_name" content="Kita Loket" />
+    <meta property="og:locale" content="id_ID" />
+    <!-- Lokalisasi -->
+
     <title>{{{ title }}}</title>
     <!-- Favicon -->
     <link rel="shortcut icon" href="/favicon/favicon.ico" type="image/x-icon" />
